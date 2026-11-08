@@ -16,6 +16,7 @@ for (let i = cats.length-1; i > 0; i--) {
   const j = Math.floor(Math.random()*(i+1)); [cats[i],cats[j]] = [cats[j],cats[i]];
 }
 if (cats.length < count) throw new Error('Not enough distinct cat packs');
+await fs.mkdir(path.join(root,'.lab'), { recursive: true });
 const directory = await fs.mkdtemp(path.join(root,'.lab/cat-simulation-'));
 const filename = path.join(directory,'snapshot.json');
 const sessions = cats.slice(0,count).map((cat,index) => ({ key:`simulation:${index}`, title:`Demo · ${cat.name}`, activity:'working', pack:cat.directory }));
