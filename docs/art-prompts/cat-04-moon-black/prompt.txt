@@ -1,0 +1,15 @@
+Use case: stylized-concept. Asset type: production pixel-art animation sprite atlas for desktop pet.
+REFERENCE: ONLY cat NUMBER 04 in the numbered selection sheet. Preserve its exact identity and distinct silhouette: round charcoal black cat with huge simple pale golden oval eyes, tall pointed ears, tiny black nose, compact body and a long curved tail; subtle muted purple shading, no white markings.
+Authentic Japanese kawaii pixel art, crisp clearly visible square pixel clusters, warm dark stepped outlines, restrained flat limited palette, minimal shading. Match reference's pixel coarseness. No photorealism, no smooth vector, no painted fine fur, no gradients, no logos.
+LAYOUT: portrait transparent PNG, aspect ratio exactly 4:9, preferably 1024x2304. EXACTLY FOUR COLUMNS by NINE ROWS, 36 frames total, equal SQUARE cells. Every frame contains exactly one complete same cat, with consistent scale, shared ground baseline at 88% cell height. Entire cat and any prop fit within central 78% of each cell with ample empty margins so tails, ears and computers NEVER cross cell boundaries. True ALPHA transparent background; no shadow, grid, text, labels, frame numbers or background scene. Props ONLY in row3 working, disappear in other states.
+Four sequential frames per animation, read left to right. Small coherent changes, loop ends returning toward start except one-shot rows. Same proportions and markings in every pose.
+ROW 1 IDLE: big golden eyes blink and tail hooks, four subtle loop poses.
+ROW 2 WALK: four-legged SIDE PROFILE FACING RIGHT walking cycle, clear contact / passing / opposite contact / passing, stable head size, alternating short legs and tail sway. No props.
+ROW 3 WORKING: playfully pouncing with front paws onto the keys of a small plum-colored open laptop, alternating crouch and tiny hop. Four genuinely different consecutive paw positions, device remains fixed on ground. Cute but clearly busy at computer; face not obscured. Whole computer and cat fully contained inside cell.
+ROW 4 ATTENTION: ears perk and golden eyes widen.
+ROW 5 SUCCESS: small starry-eyed happy bounce without external symbols, wind-up / gesture / peak / relaxed pose.
+ROW 6 ERROR: ears flatten sideways with comic baffled expression, mildly confused and cute, never distressed.
+ROW 7 SLEEP: black curled bean with tail around nose, four very small breathing poses.
+ROW 8 SPAWN: peek up then sit with tall ears, four sequential wake-and-rise poses.
+ROW 9 RETIRE: slow blink and tuck into a black bean, four sequential settle-down poses.
+No decorative symbols, letters or accessories. High-quality production sprite animation with consistent design.

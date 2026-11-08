@@ -1,0 +1,112 @@
+{
+  "formatVersion": 1,
+  "id": "local.petlab.diagnostic",
+  "name": "Diagnostic Mochi",
+  "author": "Pet Lab",
+  "license": "CC0-1.0",
+  "artworkVersion": "0.1.0",
+  "rendering": {
+    "frameSize": [
+      64,
+      64
+    ],
+    "anchor": [
+      32,
+      57
+    ],
+    "displayHeight": 96,
+    "filtering": "nearest"
+  },
+  "animations": {
+    "idle": {
+      "image": "sprites/idle.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 160
+    },
+    "walk": {
+      "image": "sprites/walk.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 110,
+      "facing": "right",
+      "allowMirror": true
+    },
+    "working": {
+      "image": "sprites/working.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 110
+    },
+    "retire": {
+      "image": "sprites/retire.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "frameDurationMs": 110
+    },
+    "attention": {
+      "image": "sprites/attention.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 110
+    },
+    "spawn": {
+      "image": "sprites/spawn.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 110
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pet Lab pack manifest draft version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["formatVersion", "id", "name", "author", "license", "artworkVersion", "rendering", "animations"],
+  "properties": {
+    "formatVersion": {"const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "author": {"type": "string", "minLength": 1},
+    "license": {"type": "string", "minLength": 1},
+    "artworkVersion": {"type": "string", "minLength": 1},
+    "rendering": {
+      "type": "object", "additionalProperties": false,
+      "required": ["frameSize", "anchor", "displayHeight", "filtering"],
+      "properties": {
+        "frameSize": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1, "maximum": 1024}},
+        "anchor": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 0, "maximum": 1024}},
+        "displayHeight": {"type": "integer", "minimum": 16, "maximum": 256},
+        "filtering": {"enum": ["nearest", "linear"]}
+      }
+    },
+    "animations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["idle", "walk", "working", "retire"],
+      "properties": {
+        "idle": {"$ref": "#/$defs/animation"},
+        "walk": {"$ref": "#/$defs/animation"},
+        "working": {"$ref": "#/$defs/animation"},
+        "retire": {"$ref": "#/$defs/animation"},
+        "spawn": {"$ref": "#/$defs/animation"},
+        "attention": {"$ref": "#/$defs/animation"},
+        "success": {"$ref": "#/$defs/animation"},
+        "error": {"$ref": "#/$defs/animation"},
+        "sleep": {"$ref": "#/$defs/animation"}
+      }
+    }
+  },
+  "$defs": {
+    "animation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["image", "frames", "frameDurationMs"],
+      "properties": {
+        "image": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\]+\\.png$"},
+        "frames": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "integer", "minimum": 0}},
+        "frameDurationMs": {"type": "integer", "minimum": 16, "maximum": 2000},
+        "frameDurationsMs": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "integer", "minimum": 16, "maximum": 2000}},
+        "facing": {"enum": ["left", "right"]},
+        "allowMirror": {"type": "boolean"}
+      }
+    }
+  }
+}

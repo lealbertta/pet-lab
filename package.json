@@ -1,0 +1,18 @@
+{
+  "name": "pet-lab-local",
+  "version": "0.6.0",
+  "private": true,
+  "description": "A local macOS desktop pet that follows Claude CLI activity",
+  "type": "module",
+  "license": "UNLICENSED",
+  "bin": { "pet-lab": "bin/pet-lab.mjs" },
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "engines": { "node": ">=22" },
+  "files": ["bin/", "lib/", "native/Pet Lab.app/", "packs/", "docs/local-package.md"],
+  "scripts": {
+    "build:native": "node tools/build-native.mjs",
+    "start": "node bin/pet-lab.mjs",
+    "test": "node --test tests-node/*.test.mjs tools/test_claude_registry.mjs"
+  }
+}

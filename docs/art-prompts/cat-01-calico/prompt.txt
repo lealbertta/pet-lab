@@ -1,0 +1,17 @@
+Use case: stylized-concept
+Asset type: final transparent pixel-art ANIMATION SPRITE SHEET for an actual desktop cat pet.
+Reference image role: CHARACTER IDENTITY AND PIXEL STYLE. Use ONLY cat number 01, at TOP LEFT of the reference. Ignore all other cats. Reproduce 01's charming squat round maneki-neko-like calico proportions, tiny crescent smile eyes, pink tiny nose and w-mouth, wide cream white face and pear-shaped cream body, charcoal patch on viewer-left ear/head, ginger patch on viewer-right forehead, ginger and charcoal flank patches, stubby paws and thick striped tail curled on viewer-right. Keep this SAME cat identity and patch placement through every frame. No big glossy eyes, no realistic furry kitten rendering. Match the reference's simple large square pixel clusters, flat limited palette, warm dark outlines and minimal shading. Crisp high-resolution pixels designed at about 64x64 native resolution then enlarged.
+
+OUTPUT EXACTLY: 1024 pixels WIDE by 2304 pixels HIGH. Sprite atlas of 4 columns x 9 rows. All 36 cells EXACTLY 256x256 pixels. Transparent alpha background. Each cell contains one complete cat, never crossing cell boundaries. All cats centered at x=128 inside their cell. Shared ground baseline y=224 in every cell except intentional airborne bounce. Character is about 170 pixels tall when seated, consistent head size throughout. At least 20 pixels transparent margins around each pose. No labels, no numbers, no grid, no text, no decorations outside the cat, no ground shadows.
+
+Each ROW is a distinct animation, frames read left to right. Make true sequential animation poses with small deliberate changes and coherent anatomy, NOT unrelated illustrations.
+Row 1 IDLE: seated relaxed looking forward, sleepy smile; frame1 neutral eyes open tiny dots, frame2 half blink with slight tail curl, frame3 eyes closed crescent happy with breathing rise, frame4 neutral matching frame1 with tail relaxed. Subtle looping motion.
+Row 2 WALK: four-legged right-facing side-profile walk cycle; right/front contact, passing position, opposite contact, passing position; legs alternate clearly, stable body scale and ground line, tail curved upward. Entire cat fully contained.
+Row 3 WORKING: front three-quarter seated focused biscuit-kneading loop: left front paw lifted, left pressed down/right lifted, right pressed down, both relaxed; concentrated tiny eyes; fluffy cheeks and content mouth. No laptop or props.
+Row 4 ATTENTION: seated looking gently upward toward user, head upright then tilt left then upright then tilt right; one front paw slightly lifted inviting interaction.
+Row 5 SUCCESS: delighted crouch, small happy hop with paws lifted, land in soft squash, return to upright proud smile. No floating symbols.
+Row 6 ERROR: puzzled head tilt, small surprised round mouth and ears spread, sheepish paw touching cheek, relaxed hopeful face. Charming rather than distressed.
+Row 7 SLEEP: curled up with tail tucked around body, eyes closed; four very subtle breathing frames, same sleeping silhouette and size, no Z letters.
+Row 8 SPAWN: curled sleeping kitten, kitten lifting its head, rising into seated small stretch, final relaxed upright seated pose.
+Row 9 RETIRE: seated with one paw raised, gentle goodbye paw wave, lowering into curled pose, fully curled asleep. No fading baked into image.
+Remember EXACT 4x9 uniform grid, transparent background, original 01 pixel-cat identity unchanged, 36 coherent production sprite frames.

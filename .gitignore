@@ -1,0 +1,11 @@
+.build/
+.lab/
+artifacts/
+__pycache__/
+.DS_Store
+native/*.app/
+*.tgz
+node_modules/
+.env
+.env.*
+*.log

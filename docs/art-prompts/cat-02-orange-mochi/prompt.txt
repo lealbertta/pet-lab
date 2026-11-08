@@ -1,0 +1,18 @@
+Use case: stylized-concept
+Asset type: production pixel-art ANIMATION SPRITE ATLAS for a desktop cat pet.
+Reference image: use ONLY cat 02, second cat in TOP ROW. The other nineteen cats are NOT targets. Faithfully preserve 02's round squashy mochi body, very small triangular ears, wide cheeks, short tucked forepaws, creamy white muzzle/chest/belly, rich marmalade orange fur, broad darker ginger stripes on forehead and sides, sleepy closed crescent eyes and tiny happy pink mouth, short thick orange striped tail wrapped around its viewer-right side. The belly is broad and soft; this cat is much wider and rounder than a normal kitten. Preserve those proportions and markings in every frame. Japanese kawaii pixel-art aesthetic, large deliberate square pixel clusters, crisp stepped warm brown outline, restrained flat shading about 12 colors. Same pixel coarseness as reference 02. No realism, no airbrushed fur, no glossy anime eyes, no gradients, no props, no hats.
+
+Exact layout: 4 COLUMNS by 9 ROWS of square equal cells, 36 frames total, portrait atlas with aspect ratio 4:9. Prefer 1024x2304. Each cell 256x256 in that size. Full cat entirely inside each cell with 20px minimum margin. Center at cell x=128 and common floor at cell y=224. Keep head scale and body size consistent; no clipped tail/ears. Genuine ALPHA TRANSPARENT BACKGROUND, no shadows, no grid, no labels, no text. Nothing but the cat in each cell.
+
+Each ROW is one four-frame sequential animation read LEFT TO RIGHT:
+Row 1 IDLE: extremely round seated cat breathing slowly; happy closed eyes, half-open sleepy eyes, soft blink, closed-eye smile again; very small tail-tip twitch. Calm looping motion.
+Row 2 WALK: RIGHT-FACING SIDE PROFILE four-legged slow waddling walk cycle; short legs in contact / passing / opposite contact / passing. Big rounded belly, tiny steps, small alternating body tilt, striped tail curled behind. Anatomically coherent walking feet; fully inside cells.
+Row 3 WORKING: seated cat rhythmically taps its round belly with alternating front paws like sleepy little typing: left paw raised, left paw down/right raised, right down, both paws relaxed. Half-lidded focused expression with tiny eyes. Keep paw changes clearly visible.
+Row 4 ATTENTION: leaning forward to peek up at user; neutral, big round yawn mouth, closing yawn with tiny pink tongue, content alert look up. Gentle sleepy request for attention.
+Row 5 SUCCESS: joyful seated wiggle dance: lean body LEFT with both tiny paws raised, centered happy paws, lean RIGHT with paws raised, return seated content. All four frames grounded, no hopping. Distinct from a jumping celebration.
+Row 6 ERROR: mildly baffled sleepy cat: one ear tilted, head tilts sideways, tiny paw scratches behind ear, then sheepish closed-eye smile. No distress or tears.
+Row 7 SLEEP: round orange loaf with head resting on front paws and striped tail wrapped alongside, closed eyes; four very small breathing changes, no size drift, no letters.
+Row 8 SPAWN: wake from loaf, lift head yawning, long front-paws-forward stretch with rear raised, settle into round seated pose. Keep whole stretch inside cell.
+Row 9 RETIRE: seated cat licks raised paw, rubs cheek with paw, tucks both paws underneath, settles into sleeping orange loaf.
+
+Make real consecutive animation changes, same one character throughout all 36 cells. No calico patches, no black fur, no other cats. Crisp cute Japanese pixel pet, NOT soft painted kitten.

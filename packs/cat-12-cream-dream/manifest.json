@@ -1,0 +1,168 @@
+{
+  "formatVersion": 1,
+  "id": "local.petlab.cat12.cream-dream",
+  "name": "12 · Cream Dream",
+  "author": "Albert Le · artwork generated with OpenAI ImageGen",
+  "license": "AI-generated original artwork for this personal Pet Lab project; no third-party reference artwork included.",
+  "artworkVersion": "1.0.1",
+  "rendering": {
+    "frameSize": [
+      209,
+      209
+    ],
+    "anchor": [
+      104,
+      190
+    ],
+    "displayHeight": 144,
+    "filtering": "nearest"
+  },
+  "animations": {
+    "idle": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        900,
+        180,
+        240,
+        900
+      ]
+    },
+    "walk": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        180,
+        180,
+        180,
+        180
+      ],
+      "facing": "right",
+      "allowMirror": true
+    },
+    "working": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        240,
+        240,
+        240,
+        240
+      ]
+    },
+    "attention": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        450,
+        350,
+        350,
+        450
+      ]
+    },
+    "success": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        16,
+        17,
+        18,
+        19
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        200,
+        200,
+        250,
+        600
+      ]
+    },
+    "error": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        20,
+        21,
+        22,
+        23
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        400,
+        400,
+        400,
+        600
+      ]
+    },
+    "sleep": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        24,
+        25,
+        26,
+        27
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        800,
+        800,
+        800,
+        800
+      ]
+    },
+    "spawn": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        350,
+        350,
+        450,
+        550
+      ]
+    },
+    "retire": {
+      "image": "sprites/atlas-clean.png",
+      "frames": [
+        32,
+        33,
+        34,
+        35
+      ],
+      "frameDurationMs": 200,
+      "frameDurationsMs": [
+        400,
+        400,
+        400,
+        700
+      ]
+    }
+  }
+}
