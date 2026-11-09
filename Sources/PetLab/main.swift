@@ -520,12 +520,13 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                let snapshot = try? JSONDecoder().decode(MonitorSnapshot.self, from: data), snapshot.schemaVersion == 1 {
                 do { try applyMode(snapshot: snapshot, screen: screen) }
                 catch { fputs("Pet Lab: \(error.localizedDescription)\n", stderr); NSApp.terminate(nil); return }
+                let busy = [Activity.working, .attention].contains(snapshot.sharedActivity)
                 if !multicats, let old = monitorSnapshot,
                    !Set(old.sessions.map(\.key)).subtracting(snapshot.sessions.map(\.key)).isEmpty,
-                   snapshot.sharedActivity != .working, let animation = pack.manifest.animations["retire"] {
+                   !busy, let animation = pack.manifest.animations["retire"] {
                     retirementUntil = elapsed + animation.frames.indices.reduce(0.0) { $0 + animation.duration(at: $1) }
                 }
-                if snapshot.sharedActivity == .working { retirementUntil = 0 }
+                if busy { retirementUntil = 0 }
                 monitorSnapshot = snapshot; monitorHealthy = true; snapshotModified = modified
                 if multicats {
                     do { try reconcileCats(snapshot: snapshot, screen: screen, elapsed: elapsed) }

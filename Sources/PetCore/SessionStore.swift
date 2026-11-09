@@ -88,8 +88,8 @@ public final class SessionStore {
 
     public var sharedActivity: Activity {
         let states = sessions.values.map(\.activity)
-        // Keep ongoing work visible. Attention remains independently represented as a count.
-        for value in [Activity.working, .attention, .uncertain, .failed, .completed, .interrupted] {
+        // A session waiting on the user outranks ongoing work so it is never hidden.
+        for value in [Activity.attention, .working, .uncertain, .failed, .completed, .interrupted] {
             if states.contains(value) { return value }
         }
         return .idle

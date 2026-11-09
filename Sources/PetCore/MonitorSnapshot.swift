@@ -16,13 +16,14 @@ public struct MonitorSnapshot: Decodable {
         MonitorSnapshot(schemaVersion: schemaVersion, generation: generation, mode: mode, sharedPack: sharedPack, sessions: sessions.filter { $0.key == key })
     }
     public var sharedActivity: Activity {
-        for state in [Activity.working, .attention, .uncertain, .failed, .completed, .interrupted] {
+        // A session waiting on the user outranks work, so it is never hidden behind a busy one.
+        for state in [Activity.attention, .working, .uncertain, .failed, .completed, .interrupted] {
             if sessions.contains(where: { $0.activity == state }) { return state }
         }
         return .idle
     }
     public var preferredSession: Session? {
-        let order: [Activity] = [.working, .attention, .uncertain, .idle, .completed, .failed, .interrupted, .retired]
+        let order: [Activity] = [.attention, .working, .uncertain, .idle, .completed, .failed, .interrupted, .retired]
         return sessions.sorted {
             let a = order.firstIndex(of: $0.activity) ?? order.count
             let b = order.firstIndex(of: $1.activity) ?? order.count

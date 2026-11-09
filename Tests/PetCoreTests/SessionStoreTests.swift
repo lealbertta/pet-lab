@@ -19,7 +19,7 @@ final class SessionStoreTests: XCTestCase {
         let store = SessionStore()
         store.apply(event("turnStart")); store.apply(event("turnStart", session: "b"))
         store.apply(event("attention", time: 2))
-        XCTAssertEqual(store.sharedActivity, .working); XCTAssertEqual(store.attentionCount, 1)
+        XCTAssertEqual(store.sharedActivity, .attention); XCTAssertEqual(store.attentionCount, 1)
         store.apply(event("completed", session: "b", time: 3))
         XCTAssertEqual(store.sharedActivity, .attention)
     }

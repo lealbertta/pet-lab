@@ -20,7 +20,7 @@ const isStopped = error => ['ENOENT', 'ECONNREFUSED'].includes(error.code);
 const print = value => {
   if (args.includes('--json')) console.log(JSON.stringify(value));
   else if (!value.running) console.log('Pet Lab is stopped.');
-  else console.log(`Pet Lab is ${value.activity}${value.ready ? '' : ' (starting)'} — ${value.sessionCount} Claude session(s)${value.mode === 'multicats' ? ` · ${value.petCount} cats` : ''}.`);
+  else console.log(`Pet Lab is ${value.activity === 'attention' ? 'waiting for you' : value.activity}${value.ready ? '' : ' (starting)'} — ${value.sessionCount} Claude session(s)${value.mode === 'multicats' ? ` · ${value.petCount} cats` : ''}.`);
 };
 
 async function stopMonitor() {

@@ -47,6 +47,11 @@ final class DesktopTests: XCTestCase {
         let sideDock = DesktopGeometry.standingArea(screen: screen, visible: CGRect(x: 60, y: 0, width: 1380, height: 875))
         XCTAssertEqual(sideDock.minX, 60)
     }
+    func testSessionWaitingForInputOutranksWork() throws {
+        let snapshot = try JSONDecoder().decode(MonitorSnapshot.self, from: Data(#"{"schemaVersion":1,"generation":"w","sessions":[{"key":"a","activity":"working"},{"key":"b","activity":"attention","title":"Asks a question"},{"key":"c","activity":"idle"}]}"#.utf8))
+        XCTAssertEqual(snapshot.sharedActivity, .attention)
+        XCTAssertEqual(snapshot.preferredSession?.key, "b")
+    }
     func testExplicitResultsReachPlaybackWithoutOverridingBusySession() throws {
         for state in [Activity.completed, .failed] {
             let data = Data("{\"schemaVersion\":1,\"generation\":\"result\",\"sessions\":[{\"key\":\"a\",\"activity\":\"\(state.rawValue)\"}]}".utf8)

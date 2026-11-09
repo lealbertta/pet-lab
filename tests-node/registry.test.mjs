@@ -16,6 +16,7 @@ test('process creation identity prevents PID reuse from appearing busy', () => {
 test('shared pet is idle without sessions and keeps working across idle sessions', () => {
   assert.equal(activityOf([]), 'idle');
   assert.equal(activityOf([{ activity: 'idle' }, { activity: 'working' }]), 'working');
+  assert.equal(activityOf([{ activity: 'working' }, { activity: 'attention' }]), 'attention');
 });
 test('process identity is independent of the launching shell timezone', async () => {
   const previous = process.env.TZ;

@@ -67,7 +67,10 @@ final class ActivityBar: NSObject {
         let activity = healthy ? selected?.activity ?? .idle : .uncertain
         let status = Self.label(activity)
         let workingCount = sessions.filter { $0.activity == .working }.count
-        let summary = workingCount > 0 ? "\(workingCount) working" : "\(sessions.count) session\(sessions.count == 1 ? "" : "s")"
+        let waitingCount = sessions.filter { $0.activity == .attention }.count
+        let counts = (waitingCount > 0 ? ["\(waitingCount) waiting"] : [])
+            + (workingCount > 0 ? ["\(workingCount) working"] : [])
+        let summary = counts.isEmpty ? "\(sessions.count) session\(sessions.count == 1 ? "" : "s")" : counts.joined(separator: " · ")
         let detail = healthy ? "Claude · \(status) · \(summary)" : "Checking session status…"
         let next = title + detail
         if fingerprint != next {
