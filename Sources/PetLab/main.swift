@@ -22,8 +22,15 @@ let packURL = URL(fileURLWithPath: option("--pack", fallback: defaultPack.path))
 let preferencesURL = URL(fileURLWithPath: option("--preferences-file", fallback:
     FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Pet Lab/preferences.json").path))
 
+extension NSScreen {
+    /// Visible frame with an auto-hidden Dock's reserved strip given back, so pets reach the bottom edge.
+    var standingFrame: CGRect { DesktopGeometry.standingArea(screen: frame, visible: visibleFrame) }
+}
+
 final class PetView: SKView {
     var topAccessoryHeight: CGFloat = 0
+    /// Height of the pet's feet above the bottom of the window (transparent padding below them).
+    var footInset: CGFloat = 0
     var onMenu: (() -> Void)?
     var onDrag: (() -> Void)?
     var onClick: (() -> Void)?
@@ -40,8 +47,8 @@ final class PetView: SKView {
         let screens = NSScreen.screens.map(\.frame)
         if let bounds = NSScreen.screens.first(where: { $0.frame.contains(current) })?.frame
             ?? DesktopGeometry.containingScreen(for: proposed, screens: screens) {
-            let visible = NSScreen.screens.first(where: { $0.frame == bounds })?.visibleFrame ?? bounds
-            window.setFrame(DesktopGeometry.clamp(proposed, to: DesktopGeometry.petBounds(on: visible, accessoryHeight: topAccessoryHeight)), display: true)
+            let visible = NSScreen.screens.first(where: { $0.frame == bounds })?.standingFrame ?? bounds
+            window.setFrame(DesktopGeometry.clamp(proposed, to: DesktopGeometry.petBounds(on: visible, accessoryHeight: topAccessoryHeight, footInset: footInset)), display: true)
         }
         mouseDownPoint = current; onDrag?()
     }
@@ -82,7 +89,7 @@ final class PetWindow {
         let scale = CGFloat(rendering.displayHeight) / CGFloat(rendering.frameSize[1])
         let width = CGFloat(rendering.frameSize[0]) * scale
         let height = CGFloat(rendering.displayHeight)
-        baseline = physicalBottom ? screen.frame.minY + 8 : screen.visibleFrame.minY + 8
+        baseline = (physicalBottom ? screen.frame.minY : screen.standingFrame.minY) - 12
         panel = NSPanel(contentRect: NSRect(x: screen.visibleFrame.minX + 150 + CGFloat(index)*150,
                                            y: baseline, width: width, height: height+24),
                         styleMask: [.borderless, .nonactivatingPanel], backing: .buffered, defer: false)
@@ -92,6 +99,7 @@ final class PetWindow {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.isReleasedWhenClosed = false
         view = PetView(frame: NSRect(origin: .zero, size: panel.frame.size))
+        view.footInset = 12
         view.allowsTransparency = true; view.preferredFramesPerSecond = 30
         view.setAccessibilityLabel("Pet Lab diagnostic companion \(index+1)")
         panel.contentView = view
@@ -173,13 +181,16 @@ final class PetWindow {
         let rendering = pack.manifest.rendering
         let layout = PetSizeLayout(frameSize: rendering.frameSize, anchor: rendering.anchor,
                                    displayHeight: rendering.displayHeight, scale: value.sizeScale)
-        let origin = NSPoint(x: panel.frame.midX-layout.windowSize.width/2, y: panel.frame.minY)
+        // Keep the feet on the same line while the window changes size.
+        let origin = NSPoint(x: panel.frame.midX-layout.windowSize.width/2,
+                             y: panel.frame.minY + view.footInset - layout.spritePosition.y)
+        view.footInset = layout.spritePosition.y
         panel.setFrame(NSRect(origin: origin, size: layout.windowSize), display: true)
         view.frame = NSRect(origin: .zero, size: layout.windowSize); scene.size = layout.windowSize
         node.size = layout.spriteSize; node.position = layout.spritePosition
         label.position = NSPoint(x: layout.windowSize.width/2, y: layout.spriteSize.height+6)
         if let screen = panel.screen ?? NSScreen.main {
-            let bounds = DesktopGeometry.petBounds(on: screen.visibleFrame, accessoryHeight: view.topAccessoryHeight)
+            let bounds = DesktopGeometry.petBounds(on: screen.standingFrame, accessoryHeight: view.topAccessoryHeight, footInset: view.footInset)
             panel.setFrame(DesktopGeometry.clamp(panel.frame, to: bounds), display: true)
         }
         baseline = panel.frame.minY; roamingMotion = nil; idleRoaming = nil
@@ -210,8 +221,8 @@ final class PetWindow {
 
     func update(activity: Activity, title: String, screen: NSScreen, elapsed: TimeInterval) {
         if let bounds = DesktopGeometry.containingScreen(for: panel.frame, screens: NSScreen.screens.map(\.frame)) {
-            let visible = NSScreen.screens.first(where: { $0.frame == bounds })?.visibleFrame ?? bounds
-            let allowed = DesktopGeometry.petBounds(on: visible, accessoryHeight: view.topAccessoryHeight)
+            let visible = NSScreen.screens.first(where: { $0.frame == bounds })?.standingFrame ?? bounds
+            let allowed = DesktopGeometry.petBounds(on: visible, accessoryHeight: view.topAccessoryHeight, footInset: view.footInset)
             let clamped = DesktopGeometry.clamp(panel.frame, to: allowed)
             if panel.frame != clamped { panel.setFrame(clamped, display: false) }
         }
@@ -229,8 +240,9 @@ final class PetWindow {
         } else { idleRoaming = nil }
         animate(walkingNow ? "walk" : selectedAnimation)
         if walkingNow {
-            let bounds = (panel.screen ?? screen).visibleFrame
-            baseline = min(max(baseline, bounds.minY), max(bounds.minY, bounds.maxY-panel.frame.height))
+            let bounds = (panel.screen ?? screen).standingFrame
+            let floor = bounds.minY - view.footInset
+            baseline = min(max(baseline, floor), max(floor, bounds.maxY-view.topAccessoryHeight-panel.frame.height))
             var motion = roamingMotion ?? RoamingMotion(x: panel.frame.minX, direction: idleRoaming?.direction ?? 1)
             let x = motion.advance(seconds: elapsed, minX: bounds.minX, maxX: bounds.maxX-panel.frame.width)
             roamingMotion = motion
@@ -423,7 +435,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             configurePet(pet)
             let columns = max(1, Int(screen.visibleFrame.width / 300))
             let origin = NSPoint(x: screen.visibleFrame.minX + 30 + CGFloat(slot % columns)*300,
-                                 y: screen.visibleFrame.minY + 12 + CGFloat(slot / columns)*(pet.panel.frame.height + ActivityBar.height + 26))
+                                 y: screen.standingFrame.minY - pet.view.footInset + CGFloat(slot / columns)*(pet.panel.frame.height + ActivityBar.height + 26))
             pet.panel.setFrameOrigin(origin); pet.baseline = origin.y
             monitorPets[session.key] = pet
         }

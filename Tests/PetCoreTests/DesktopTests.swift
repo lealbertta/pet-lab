@@ -31,6 +31,20 @@ final class DesktopTests: XCTestCase {
         XCTAssertLessThanOrEqual(pet.maxY + 60, screen.maxY)
         XCTAssertTrue(screen.contains(pet))
     }
+    func testFeetRestOnFloorDespiteWindowPadding() {
+        let visible = CGRect(x: 0, y: 70, width: 1440, height: 805)
+        let allowed = DesktopGeometry.petBounds(on: visible, accessoryHeight: 0, footInset: 14.5)
+        let pet = DesktopGeometry.clamp(CGRect(x: 200, y: -300, width: 104, height: 120), to: allowed)
+        XCTAssertEqual(pet.minY + 14.5, visible.minY)
+        XCTAssertEqual(DesktopGeometry.clamp(CGRect(x: 200, y: 2000, width: 104, height: 120), to: allowed).maxY, visible.maxY)
+    }
+    func testAutoHiddenDockStripIsReturnedButVisibleDockIsRespected() {
+        let screen = CGRect(x: 0, y: 0, width: 1440, height: 900)
+        let hidden = DesktopGeometry.standingArea(screen: screen, visible: CGRect(x: 0, y: 4, width: 1440, height: 871))
+        XCTAssertEqual(hidden.minY, 0); XCTAssertEqual(hidden.maxY, 875)
+        let docked = CGRect(x: 0, y: 70, width: 1440, height: 805)
+        XCTAssertEqual(DesktopGeometry.standingArea(screen: screen, visible: docked), docked)
+    }
     func testExplicitResultsReachPlaybackWithoutOverridingBusySession() throws {
         for state in [Activity.completed, .failed] {
             let data = Data("{\"schemaVersion\":1,\"generation\":\"result\",\"sessions\":[{\"key\":\"a\",\"activity\":\"\(state.rawValue)\"}]}".utf8)
