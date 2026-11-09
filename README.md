@@ -52,7 +52,7 @@ Start with the [creator walkthrough](docs/creating-pets.md), [pack specification
 
 ## Compatibility and privacy
 
-Automatic discovery currently supports the locally verified Claude CLI **2.1.311** session registry. Other CLI versions report uncertain status until explicitly supported. Codex and Claude desktop Chat are not connected.
+Automatic discovery currently supports the locally verified Claude CLI **2.1.311**, **2.1.317** (including Claude desktop app Code sessions) and **2.1.319** session registry. Other CLI versions report uncertain status until explicitly supported. Codex and Claude desktop Chat are not connected.
 
 The app reads local session metadata and checks process identity. It does not read transcripts or prompts, edit Claude hooks, send telemetry, or make model/API calls. Runtime files live in `~/Library/Application Support/Pet Lab` with user-only permissions. Communication uses a local Unix socket.
 

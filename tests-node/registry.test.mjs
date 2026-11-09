@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { classifyRecord, readRegistry, activityOf, processIdentities } from '../lib/claude-registry.mjs';
+import { classifyRecord, readRegistry, activityOf, processIdentities, cachedProcessIdentities } from '../lib/claude-registry.mjs';
 
 const started = 'Fri Nov  6 18:05:13 2026';
 const record = { version: '2.1.311', kind: 'interactive', sessionId: 'test', pid: 123, procStart: started, status: 'busy' };
@@ -40,4 +40,24 @@ test('snapshot discovers busy sessions, drops dead records and excludes private 
   await fs.writeFile(path.join(root, 'live.json'), '{invalid');
   const lost = await readRegistry(root, snapshot.sessions, async () => new Map());
   assert.equal(lost.sessions[0].activity, 'uncertain');
+});
+test('desktop app 2.1.317 sessions are classified, and waiting maps to attention', () => {
+  assert.equal(classifyRecord({ ...record, version: '2.1.317' }, started), 'working');
+  assert.equal(classifyRecord({ ...record, version: '2.1.317', status: 'waiting' }, started), 'attention');
+});
+test('cached identities call ps only for new or stale PIDs and drop exited processes', async () => {
+  let time = 0, lookups = []; const living = new Set([1, 2]);
+  const identify = cachedProcessIdentities({ verifyEveryMs: 10000, now: () => time, alive: pid => living.has(pid),
+    lookup: async pids => { lookups.push(pids); return new Map(pids.filter(p => living.has(p)).map(p => [p, `start-${p}`])); } });
+  assert.deepEqual([...await identify([1, 2])], [[1, 'start-1'], [2, 'start-2']]);
+  time = 5000; living.delete(2);
+  assert.deepEqual([...await identify([1, 2])], [[1, 'start-1']]);
+  assert.equal(lookups.length, 1);
+  assert.deepEqual([...await identify([1, 3])].map(([p]) => p), [1]);
+  assert.deepEqual(lookups.at(-1), [3]);
+  time = 15000;
+  await identify([1]);
+  assert.deepEqual(lookups.at(-1), [1]);
+  lookups = []; const failing = cachedProcessIdentities({ lookup: async () => null });
+  assert.equal(await failing([1]), null);
 });

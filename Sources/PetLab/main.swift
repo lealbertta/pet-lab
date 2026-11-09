@@ -10,6 +10,9 @@ func json(_ object: Any) {
 }
 
 let arguments = Array(CommandLine.arguments.dropFirst())
+/// Pack frames last at least 110 ms (~9 fps) and roaming moves 22 pt/s, so 15 fps keeps timing
+/// and walking smooth while halving the redraw and update work of the old 30 fps loop.
+let petFramesPerSecond = 15
 func option(_ name: String, fallback: String) -> String {
     guard let i = arguments.firstIndex(of: name), arguments.indices.contains(i+1) else { return fallback }
     return arguments[i+1]
@@ -82,6 +85,7 @@ final class PetWindow {
     var animationDurations: [String: TimeInterval] = [:]
     var preferences = PetPreferences()
     var onSettings: (() -> Void)?
+    var onClose: (() -> Void)?
 
     init(pack: LoadedPack, screen: NSScreen, index: Int, physicalBottom: Bool) throws {
         self.pack = pack; self.index = index
@@ -100,7 +104,7 @@ final class PetWindow {
         panel.isReleasedWhenClosed = false
         view = PetView(frame: NSRect(origin: .zero, size: panel.frame.size))
         view.footInset = 12
-        view.allowsTransparency = true; view.preferredFramesPerSecond = 30
+        view.allowsTransparency = true; view.preferredFramesPerSecond = petFramesPerSecond
         view.setAccessibilityLabel("Pet Lab diagnostic companion \(index+1)")
         panel.contentView = view
         scene = SKScene(size: panel.frame.size); scene.backgroundColor = .clear
@@ -160,6 +164,7 @@ final class PetWindow {
     @objc func toggleRoaming() { roaming.toggle(); roamingMotion = nil; idleRoaming = nil }
     @objc func openSettings() { onSettings?() }
     @objc func quit() { NSApp.terminate(nil) }
+    @objc func closeCat() { onClose?() }
     func showMenu() {
         let menu = NSMenu()
         let settings = menu.addItem(withTitle: "Settings…", action: #selector(openSettings), keyEquivalent: "")
@@ -167,6 +172,10 @@ final class PetWindow {
         menu.addItem(.separator())
         let roam = menu.addItem(withTitle: roaming ? "Pause roaming" : "Resume roaming", action: #selector(toggleRoaming), keyEquivalent: "")
         roam.target = self
+        if onClose != nil {
+            let close = menu.addItem(withTitle: "Close this cat", action: #selector(closeCat), keyEquivalent: "")
+            close.target = self
+        }
         let quit = menu.addItem(withTitle: "Quit Pet Lab", action: #selector(quit), keyEquivalent: "")
         quit.target = self
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: 20), in: view)
@@ -296,6 +305,8 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
     var multicats = arguments.contains("--multicats")
     var monitorPets: [String: PetWindow] = [:]
     var retiringUntil: [String: TimeInterval] = [:]
+    /// Sessions whose cat the user closed; cleared when the session ends or on "Bring back closed cats".
+    var closedSessionKeys: Set<String> = []
     var cachedPacks: [String: LoadedPack] = [:]
     var sessionKeys: [String] = []
     var pack: LoadedPack!
@@ -303,6 +314,9 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
     var monitorSnapshot: MonitorSnapshot?
     var monitorHealthy = false
     var lastSnapshotRead: TimeInterval = -1
+    var snapshotModified: Date?
+    var preferencesModified: Date?
+    var preferencesChecked = false
     var retirementUntil: TimeInterval = 0
     var preferences = PetPreferences.load(from: preferencesURL)
     var settingsController: SettingsWindowController?
@@ -353,7 +367,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             quit.target = self; statusMenu = menu
             json(["started": true, "mode": stateFile != nil ? (multicats ? "multicats" : "shared") : queue == nil ? "synthetic-demo" : "event-queue", "displayCount": NSScreen.screens.count,
                   "decodedPixelBytes": pack.decodedBytes, "appActive": NSApp.isActive])
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0/30, repeats: true) { [weak self] _ in self?.tick() }
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0/Double(petFramesPerSecond), repeats: true) { [weak self] _ in self?.tick() }
         } catch { fputs("Pet Lab: \(error.localizedDescription)\n", stderr); exit(1) }
     }
 
@@ -363,10 +377,21 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func quitFromMenu() { NSApp.terminate(nil) }
+    static let restoreTag = 7301
+    @objc func restoreClosedCats() { closedSessionKeys.removeAll() }
+    func closeCat(for key: String) { closedSessionKeys.insert(key) }
 
     @objc func statusItemClicked(_ sender: NSStatusBarButton) {
         if NSApp.currentEvent?.type == .rightMouseUp {
-            statusMenu?.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.minY), in: sender)
+            guard let menu = statusMenu else { return }
+            menu.items.filter { $0.tag == Self.restoreTag }.forEach(menu.removeItem)
+            if !closedSessionKeys.isEmpty {
+                let count = closedSessionKeys.count
+                let restore = NSMenuItem(title: "Bring back closed cats (\(count))", action: #selector(restoreClosedCats), keyEquivalent: "")
+                restore.target = self; restore.tag = Self.restoreTag
+                menu.insertItem(restore, at: 1)
+            }
+            menu.popUp(positioning: nil, at: NSPoint(x: 0, y: sender.bounds.minY), in: sender)
         } else { showSettings() }
     }
 
@@ -413,8 +438,10 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
     }
 
     func reconcileCats(snapshot: MonitorSnapshot, screen: NSScreen, elapsed: TimeInterval) throws {
-        let active = Set(snapshot.sessions.map(\.key))
-        for session in snapshot.sessions {
+        closedSessionKeys.formIntersection(snapshot.sessions.map(\.key))
+        let shown = snapshot.sessions.filter { !closedSessionKeys.contains($0.key) }
+        let active = Set(shown.map(\.key))
+        for session in shown {
             retiringUntil.removeValue(forKey: session.key)
             guard monitorPets[session.key] == nil else { continue }
             let directory = session.pack ?? pack.root.path
@@ -432,6 +459,9 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             pet.label.isHidden = true
             pet.view.topAccessoryHeight = ActivityBar.height + ActivityBar.gap
             pet.activityBar = ActivityBar(parent: pet.panel)
+            let key = session.key
+            let close: () -> Void = { [weak self] in self?.closeCat(for: key) }
+            pet.onClose = close; pet.activityBar?.onClose = close
             configurePet(pet)
             let columns = max(1, Int(screen.visibleFrame.width / 300))
             let origin = NSPoint(x: screen.visibleFrame.minX + 30 + CGFloat(slot % columns)*300,
@@ -462,7 +492,11 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
         guard let screen = NSScreen.screens.first else { return }
         if elapsed-lastPreferencesRead >= 0.5 {
             lastPreferencesRead = elapsed
-            let saved = PetPreferences.load(from: preferencesURL)
+            // Only decode preferences when the file changed (or appeared/disappeared).
+            let modified = (try? preferencesURL.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+            let changed = !preferencesChecked || modified != preferencesModified
+            preferencesChecked = true; preferencesModified = modified
+            let saved = changed ? PetPreferences.load(from: preferencesURL) : preferences
             if saved != preferences {
                 preferences = saved
                 for pet in pets { pet.applyPreferences(saved) }
@@ -471,8 +505,15 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
         }
         if let stateFile, elapsed-lastSnapshotRead >= 0.25 {
             lastSnapshotRead = elapsed
-            monitorHealthy = false
-            if let values = try? stateFile.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey]),
+            let values = try? stateFile.resourceValues(forKeys: [.fileSizeKey, .contentModificationDateKey])
+            if let modified = values?.contentModificationDate, modified == snapshotModified, let snapshot = monitorSnapshot {
+                // Unchanged since the last parse: only staleness and cat retirement timers advance.
+                monitorHealthy = Date().timeIntervalSince(modified) < 10
+                if monitorHealthy && multicats {
+                    do { try reconcileCats(snapshot: snapshot, screen: screen, elapsed: elapsed) }
+                    catch { fputs("Pet Lab: \(error.localizedDescription)\n", stderr); NSApp.terminate(nil); return }
+                }
+            } else if let values,
                (values.fileSize ?? Int.max) <= 1048576,
                let modified = values.contentModificationDate, Date().timeIntervalSince(modified) < 10,
                let data = try? Data(contentsOf: stateFile),
@@ -485,12 +526,12 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                     retirementUntil = elapsed + animation.frames.indices.reduce(0.0) { $0 + animation.duration(at: $1) }
                 }
                 if snapshot.sharedActivity == .working { retirementUntil = 0 }
-                monitorSnapshot = snapshot; monitorHealthy = true
+                monitorSnapshot = snapshot; monitorHealthy = true; snapshotModified = modified
                 if multicats {
                     do { try reconcileCats(snapshot: snapshot, screen: screen, elapsed: elapsed) }
                     catch { fputs("Pet Lab: \(error.localizedDescription)\n", stderr); NSApp.terminate(nil); return }
                 }
-            }
+            } else { monitorHealthy = false }
         }
         if let queue {
             let urls = ((try? FileManager.default.contentsOfDirectory(at: queue, includingPropertiesForKeys: nil)) ?? [])

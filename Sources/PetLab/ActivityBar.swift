@@ -18,6 +18,8 @@ final class ActivityBar: NSObject {
     private var followsActivity = true
     private var healthy = true
     private var fingerprint = ""
+    /// Set for a cat that follows one session; adds "Close this cat" to the dropdown.
+    var onClose: (() -> Void)?
 
     init(parent: NSPanel) {
         panel = NSPanel(contentRect: NSRect(x: 0, y: 0, width: 280, height: Self.height),
@@ -108,8 +110,15 @@ final class ActivityBar: NSObject {
             item.target = self; item.representedObject = session.key
             item.state = !followsActivity && selectedKey == session.key ? .on : .off
         }
+        if onClose != nil {
+            menu.addItem(.separator())
+            let close = menu.addItem(withTitle: "Close this cat", action: #selector(closeCat), keyEquivalent: "")
+            close.target = self
+            close.toolTip = "Hide this cat until its session ends or you bring it back from the menu bar"
+        }
         menu.popUp(positioning: nil, at: NSPoint(x: 0, y: -2), in: button)
     }
+    @objc private func closeCat() { onClose?() }
     @objc private func followActivity() { followsActivity = true }
     @objc private func selectSession(_ item: NSMenuItem) { selectedKey = item.representedObject as? String; followsActivity = false }
 
