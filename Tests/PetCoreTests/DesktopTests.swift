@@ -38,12 +38,14 @@ final class DesktopTests: XCTestCase {
         XCTAssertEqual(pet.minY + 14.5, visible.minY)
         XCTAssertEqual(DesktopGeometry.clamp(CGRect(x: 200, y: 2000, width: 104, height: 120), to: allowed).maxY, visible.maxY)
     }
-    func testAutoHiddenDockStripIsReturnedButVisibleDockIsRespected() {
+    func testPetsStandOnPhysicalBottomEdgeWithOrWithoutDock() {
         let screen = CGRect(x: 0, y: 0, width: 1440, height: 900)
         let hidden = DesktopGeometry.standingArea(screen: screen, visible: CGRect(x: 0, y: 4, width: 1440, height: 871))
         XCTAssertEqual(hidden.minY, 0); XCTAssertEqual(hidden.maxY, 875)
-        let docked = CGRect(x: 0, y: 70, width: 1440, height: 805)
-        XCTAssertEqual(DesktopGeometry.standingArea(screen: screen, visible: docked), docked)
+        let docked = DesktopGeometry.standingArea(screen: screen, visible: CGRect(x: 0, y: 57, width: 1440, height: 818))
+        XCTAssertEqual(docked.minY, 0); XCTAssertEqual(docked.maxY, 875)
+        let sideDock = DesktopGeometry.standingArea(screen: screen, visible: CGRect(x: 60, y: 0, width: 1380, height: 875))
+        XCTAssertEqual(sideDock.minX, 60)
     }
     func testExplicitResultsReachPlaybackWithoutOverridingBusySession() throws {
         for state in [Activity.completed, .failed] {

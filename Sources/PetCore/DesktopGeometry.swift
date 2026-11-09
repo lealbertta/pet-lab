@@ -8,12 +8,10 @@ public enum DesktopGeometry {
         CGRect(x: screen.minX, y: screen.minY-footInset, width: screen.width,
                height: max(0, screen.height-accessoryHeight+footInset))
     }
-    /// Where pets can stand: the visible frame, except that the few points macOS reserves for an
-    /// auto-hidden bottom Dock are given back so pets stand on the physical bottom edge.
+    /// Where pets can stand: the visible frame extended down to the physical bottom edge, so pets
+    /// can sit flush with the bottom of the screen even beside a bottom Dock.
     public static func standingArea(screen: CGRect, visible: CGRect) -> CGRect {
-        let reserved = visible.minY - screen.minY
-        guard reserved > 0, reserved <= 8 else { return visible }
-        return CGRect(x: visible.minX, y: screen.minY, width: visible.width, height: visible.maxY-screen.minY)
+        CGRect(x: visible.minX, y: screen.minY, width: visible.width, height: visible.maxY-screen.minY)
     }
     public static func clamp(_ frame: CGRect, to bounds: CGRect) -> CGRect {
         var result = frame
