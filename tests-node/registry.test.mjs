@@ -62,3 +62,7 @@ test('cached identities call ps only for new or stale PIDs and drop exited proce
   lookups = []; const failing = cachedProcessIdentities({ lookup: async () => null });
   assert.equal(await failing([1]), null);
 });
+test('any 2.x version from 2.1.311 on is accepted; older, 3.x and malformed versions stay uncertain', () => {
+  for (const version of ['2.1.311', '2.1.321', '2.2.0', '2.10.4']) assert.equal(classifyRecord({ ...record, version }, started), 'working', version);
+  for (const version of ['2.1.310', '2.0.999', '1.9.0', '3.0.0', '2.1', '2.1.321-beta', 'new', undefined]) assert.equal(classifyRecord({ ...record, version }, started), 'uncertain', String(version));
+});

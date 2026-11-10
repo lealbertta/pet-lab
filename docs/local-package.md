@@ -25,7 +25,7 @@ Optional environment overrides:
 
 Stop a running instance before changing its pack or environment. Settings and mode changes do not require a restart.
 
-The current registry adapter supports Claude CLI 2.1.311 only. It checks process creation identity, does not read prompts or transcripts, and does not change provider configuration. Explicit success/failure reactions require a separate result event source. Claude questions and approvals are not captured by this adapter.
+The registry adapter supports Claude Code 2.1.311 and later 2.x releases, including desktop app Code sessions. It checks process creation identity, does not read prompts or transcripts, and does not change provider configuration. Explicit success/failure reactions require a separate result event source. Claude questions and approvals are not captured by this adapter.
 
 The app uses a user-only Unix socket rather than a TCP listener. `pet-lab status --json` reports mode, preferences, counts, and up to 64 per-pet samples without session IDs or titles. The renderer still creates a cat for every discovered session.
 
