@@ -10,6 +10,7 @@ for (const filename of await fs.readdir(registry)) await fs.rm(path.join(registr
 const env = { ...process.env, PET_LAB_STATE_DIR: stateRoot, PET_LAB_CLAUDE_REGISTRY: registry };
 delete env.PET_LAB_PACK;
 const cli = async (...args) => (await execute(process.execPath, ['bin/pet-lab.mjs', ...args], { env, timeout: 25000 })).stdout;
+const poolSize = JSON.parse(await cli('pets','--json')).length;
 const status = async () => JSON.parse(await cli('status', '--json'));
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(predicate, timeout = 15000) {
@@ -48,14 +49,14 @@ try {
   await cli('--multicats'); assert.equal((await status()).pid, empty.pid); checks.repeatStartReusesMonitor = true;
   // Capture real native rendering with fixture-only titles and the same assigned packs.
   await execute(path.join(root,'native/Pet Lab.app/Contents/MacOS/pet-lab'), ['--state-file',path.join(stateRoot,'snapshot.json'),'--multicats','--duration','8','--capture-activity-bar','--output',path.join(root,'evidence/multicats-preview')], { timeout: 20000 });
-  for (let i = 3; i < 13; i++) await session(i);
-  current = await until(s => s.petCount === 13 && s.pets.length === 13 && s.pets.every(p => p.visible));
-  assert.equal(new Set(current.pets.map(p => p.pack)).size,12);
+  for (let i = 3; i < poolSize+1; i++) await session(i);
+  current = await until(s => s.petCount === poolSize+1 && s.pets.length === poolSize+1 && s.pets.every(p => p.visible));
+  assert.equal(new Set(current.pets.map(p => p.pack)).size,poolSize);
   const counts = [...new Set(current.pets.map(p => p.pack))].map(pack => current.pets.filter(p => p.pack === pack).length);
-  assert.equal(Math.max(...counts),2); checks.thirteenSessionsUseAllTwelveBeforeRepeating = true;
+  assert.equal(Math.max(...counts),2); checks.usesEntirePoolBeforeRepeating = true;
   const beforeRemoval = assignments(await snapshot());
   await fs.rm(path.join(registry,'00.json'));
-  await until(s => s.petCount === 12);
+  await until(s => s.petCount === poolSize);
   const survivors = assignments(await snapshot());
   for(const [key, pack] of survivors) assert.equal(pack,beforeRemoval.get(key));
   checks.departureRetiresOnlyOwnCat = true;

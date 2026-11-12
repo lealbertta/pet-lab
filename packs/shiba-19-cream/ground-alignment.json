@@ -1,0 +1,290 @@
+[
+  {
+    "frame" : 0,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 200,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 21
+  },
+  {
+    "frame" : 1,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 200,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 21
+  },
+  {
+    "frame" : 2,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 200,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 21
+  },
+  {
+    "frame" : 3,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 200,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 21
+  },
+  {
+    "frame" : 4,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 177,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 44
+  },
+  {
+    "frame" : 5,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 177,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 44
+  },
+  {
+    "frame" : 6,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 177,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 44
+  },
+  {
+    "frame" : 7,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 175,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 46
+  },
+  {
+    "frame" : 12,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 194,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 27
+  },
+  {
+    "frame" : 13,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 193,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 28
+  },
+  {
+    "frame" : 14,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 193,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 28
+  },
+  {
+    "frame" : 15,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 194,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 27
+  },
+  {
+    "frame" : 16,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 189,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 32
+  },
+  {
+    "frame" : 17,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 190,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 31
+  },
+  {
+    "frame" : 18,
+    "ground" : 210,
+    "intentionalLift" : 12,
+    "originalBottom" : 179,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 30
+  },
+  {
+    "frame" : 19,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 189,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 32
+  },
+  {
+    "frame" : 20,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 189,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 32
+  },
+  {
+    "frame" : 21,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 188,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 33
+  },
+  {
+    "frame" : 22,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 188,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 33
+  },
+  {
+    "frame" : 23,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 188,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 33
+  },
+  {
+    "frame" : 24,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 160,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 61
+  },
+  {
+    "frame" : 25,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 158,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 63
+  },
+  {
+    "frame" : 26,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 208,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 13
+  },
+  {
+    "frame" : 27,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 158,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 63
+  },
+  {
+    "frame" : 28,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 164,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 57
+  },
+  {
+    "frame" : 29,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 163,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 58
+  },
+  {
+    "frame" : 30,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 164,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 57
+  },
+  {
+    "frame" : 31,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 164,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 57
+  },
+  {
+    "frame" : 32,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 170,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 51
+  },
+  {
+    "frame" : 33,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 170,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 51
+  },
+  {
+    "frame" : 34,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 159,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 62
+  },
+  {
+    "frame" : 35,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 157,
+    "sheet" : "sprites\/atlas.png",
+    "shiftY" : 64
+  },
+  {
+    "frame" : 0,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 192,
+    "sheet" : "sprites\/working.png",
+    "shiftY" : 29
+  },
+  {
+    "frame" : 1,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 192,
+    "sheet" : "sprites\/working.png",
+    "shiftY" : 29
+  },
+  {
+    "frame" : 2,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 192,
+    "sheet" : "sprites\/working.png",
+    "shiftY" : 29
+  },
+  {
+    "frame" : 3,
+    "ground" : 222,
+    "intentionalLift" : 0,
+    "originalBottom" : 192,
+    "sheet" : "sprites\/working.png",
+    "shiftY" : 29
+  }
+]

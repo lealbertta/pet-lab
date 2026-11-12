@@ -46,10 +46,10 @@ try {
     const result = await request(paths.socket, 'settings');
     if (result.error) throw new Error(result.error);
     console.log(args.includes('--json') ? JSON.stringify(result) : 'Opened Pet Lab Settings.');
-  } else if (command === 'cats') {
+  } else if (command === 'cats' || command === 'pets') {
     const cats = (await listCats(root)).map(({ number, name }) => ({ number, name }));
     console.log(args.includes('--json') ? JSON.stringify(cats) : cats.map(cat => `${cat.number}  ${cat.name.replace(/^\d+ · /, '')}`).join('\n'));
-  } else if (command === 'cat') {
+  } else if (command === 'cat' || command === 'pet') {
     const cat = await findCat(root, args[1]);
     await fs.mkdir(paths.root, { recursive: true, mode: 0o700 });
     await atomicJSON(path.join(paths.root, 'cat-selection.json'), { number: cat.number });

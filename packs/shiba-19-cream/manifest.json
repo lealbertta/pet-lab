@@ -1,0 +1,168 @@
+{
+  "animations" : {
+    "attention" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        450,
+        350,
+        350,
+        500
+      ],
+      "frames" : [
+        12,
+        13,
+        14,
+        15
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "error" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        350,
+        400,
+        450,
+        650
+      ],
+      "frames" : [
+        20,
+        21,
+        22,
+        23
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "idle" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        1000,
+        180,
+        180,
+        1000
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "retire" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        400,
+        450,
+        450,
+        700
+      ],
+      "frames" : [
+        32,
+        33,
+        34,
+        35
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "sleep" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        850,
+        850,
+        850,
+        850
+      ],
+      "frames" : [
+        24,
+        25,
+        26,
+        27
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "spawn" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        350,
+        400,
+        400,
+        600
+      ],
+      "frames" : [
+        28,
+        29,
+        30,
+        31
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "success" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        220,
+        220,
+        220,
+        600
+      ],
+      "frames" : [
+        16,
+        17,
+        18,
+        19
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "walk" : {
+      "allowMirror" : true,
+      "facing" : "right",
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        160,
+        160,
+        160,
+        160
+      ],
+      "frames" : [
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/atlas.png"
+    },
+    "working" : {
+      "frameDurationMs" : 200,
+      "frameDurationsMs" : [
+        350,
+        250,
+        350,
+        450
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3
+      ],
+      "image" : "sprites\/working.png"
+    }
+  },
+  "artworkVersion" : "1.0.0",
+  "author" : "Albert Le · artwork generated with OpenAI ImageGen",
+  "formatVersion" : 1,
+  "id" : "local.petlab.shiba19.shiba-cream",
+  "license" : "AI-generated original artwork for this personal Pet Lab project.",
+  "name" : "19 · Cream Shiba",
+  "rendering" : {
+    "anchor" : [
+      136,
+      222
+    ],
+    "displayHeight" : 188,
+    "filtering" : "nearest",
+    "frameSize" : [
+      273,
+      273
+    ]
+  }
+}

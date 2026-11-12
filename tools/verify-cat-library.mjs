@@ -7,7 +7,7 @@ import { listCats } from '../lib/cat-packs.mjs';
 const execute = promisify(execFile), root = process.cwd();
 const native = path.join(root, 'native/Pet Lab.app/Contents/MacOS/pet-lab');
 const cats = await listCats(root);
-assert.deepEqual(cats.map(cat => cat.number), ['01','02','03','04','07','08','09','11','12','13','14','15']);
+assert.deepEqual(cats.map(cat => cat.number), ['01','02','03','04','07','08','09','11','12','13','14','15','16','17','18','19']);
 const results = [];
 for (const cat of cats) {
   const { stdout } = await execute(native, ['--validate','--pack',cat.directory]);
@@ -23,5 +23,5 @@ for (const cat of cats) {
   results.push({ number: cat.number, name: cat.name, validation, workingPlayback: true, capture: path.relative(root,path.join(output,'pet-1-working.png')) });
   console.log(`${cat.name}: valid and animated`);
 }
-await fs.writeFile('evidence/cat-library-check.json', JSON.stringify({ passed:true, cats:results, animations:108 },null,2)+'\n');
-console.log('All twelve packs passed native validation and working playback.');
+await fs.writeFile('evidence/cat-library-check.json', JSON.stringify({ passed:true, cats:results, animations:results.length*9 },null,2)+'\n');
+console.log(`All ${results.length} packs passed native validation and working playback.`);
