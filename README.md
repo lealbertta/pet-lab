@@ -4,10 +4,21 @@ Pixel-art companions for your macOS desktop that follow Claude CLI sessions.
 
 ![The twelve cats at work](docs/images/cats-working.gif)
 
+## Meet the Shibas
+
+Four new companions, each with all nine animations and a different idea of getting work done.
+
+| Red · 16 | Black & Tan · 17 | Sesame · 18 | Cream · 19 |
+| --- | --- | --- | --- |
+| ![Red Shiba typing on a laptop](docs/images/shiba-16-red-working.gif) | ![Black and tan Shiba stomping on a keyboard with all four paws](docs/images/shiba-17-black-tan-working.gif) | ![Sesame Shiba peeing on a computer tower](docs/images/shiba-18-sesame-working.gif) | ![Cream Shiba tapping a tablet](docs/images/shiba-19-cream-working.gif) |
+| Laptop typing | Keyboard stompies | Computer mischief | Tablet tapping |
+
+Choose one with `pet-lab pet 16` through `pet-lab pet 19`. [See all nine animations](docs/images/shiba-transitions.gif) or read the [Shiba pack guide](docs/shibas.md).
+
 ## Features
 
-- Twelve original cat designs, each with nine animations.
-- One shared companion, or a random cat per session with unused designs chosen first.
+- Twelve original cat designs and four Shibas, each with nine animations.
+- One shared companion, or a random pet per session with unused designs chosen first.
 - Independent session activity and labels in multicats mode.
 - Session cards above each cat: the chevron switches sessions, the arrow opens the session in the Claude desktop app (or on its own Terminal/iTerm2 tab for CLI sessions), right-click closes the cat, and dragging the card moves the cat.
 - A menu-bar paw that opens Settings.
@@ -39,8 +50,8 @@ npm install --global --offline --ignore-scripts ./pet-lab-local-0.6.0.tgz
 pet-lab                 # Start or reconnect
 pet-lab settings        # Size, multicats mode, wandering, and session labels
 pet-lab -multicats       # Enable one random cat per Claude session
-pet-lab cats             # List cats
-pet-lab cat 03           # Choose one shared companion
+pet-lab pets             # List all cats and Shibas
+pet-lab pet 16           # Choose one shared companion
 pet-lab status
 pet-lab stop
 ```
@@ -72,4 +83,4 @@ The native integration checks use isolated fixture state and do not modify real 
 
 ## Project status and artwork
 
-This is a private, unsigned macOS development app. No open-source license has been selected. See [NOTICE.md](NOTICE.md) and each pack's artwork notice. The twelve cats are original ImageGen artwork; imported Alphonse and Pokémon assets, private migration history, and local activity evidence are intentionally absent from this repository.
+This is a private, unsigned macOS development app. No open-source license has been selected. See [NOTICE.md](NOTICE.md) and each pack's artwork notice. The twelve cats and four Shibas are original ImageGen artwork; imported Alphonse and Pokémon assets, private migration history, and local activity evidence are intentionally absent from this repository.
