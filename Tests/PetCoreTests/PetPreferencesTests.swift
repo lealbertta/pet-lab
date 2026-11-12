@@ -8,6 +8,7 @@ final class PetPreferencesTests: XCTestCase {
         XCTAssertEqual(PetPreferences(sizeScale: -1).sizeScale, 0.5)
         XCTAssertEqual(PetPreferences(sizeScale: .nan).sizeScale, 1)
         let old = try JSONDecoder().decode(PetPreferences.self, from: Data(#"{"sizeScale":1.5}"#.utf8))
+        XCTAssertEqual(old.disabledSprites, [])
         XCTAssertEqual(old.sizeScale, 1.5); XCTAssertTrue(old.allowWandering); XCTAssertTrue(old.showSessionLabels)
     }
     func testPersistsAndRecoversFromBadOrMissingFile() throws {
@@ -15,7 +16,7 @@ final class PetPreferencesTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: directory) }
         let file = directory.appendingPathComponent("preferences.json")
         XCTAssertEqual(PetPreferences.load(from: file), PetPreferences())
-        let changed = PetPreferences(sizeScale: 1.75, allowWandering: false, showSessionLabels: false, multicats: true)
+        let changed = PetPreferences(sizeScale: 1.75, allowWandering: false, showSessionLabels: false, multicats: true, disabledSprites: ["cat-01-calico"])
         try changed.save(to: file)
         XCTAssertEqual(PetPreferences.load(from: file), changed)
         XCTAssertEqual((try FileManager.default.attributesOfItem(atPath: file.path)[.posixPermissions] as? NSNumber)?.intValue, 0o600)

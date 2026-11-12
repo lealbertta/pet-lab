@@ -43,3 +43,17 @@ test('random choice samples the available set, and an empty library fails clearl
   assert.notEqual(first.reconcile([session('a')])[0].pack, last.reconcile([session('a')])[0].pack);
   assert.throws(() => new CatAssignments([]), /No cat packs/);
 });
+
+test('disabled cats are replaced without disturbing enabled assignments; all disabled hides pets', () => {
+  const allocator = new CatAssignments(cats, { random: () => 0 });
+  const sessions = [session('a'), session('b')];
+  const initial = allocator.reconcile(sessions, 0);
+  allocator.setCats(cats.slice(1));
+  const changed = allocator.reconcile(sessions, 1);
+  assert.notEqual(changed[0].pack, initial[0].pack);
+  assert.equal(changed[1].pack, initial[1].pack);
+  allocator.setCats([]);
+  assert.deepEqual(allocator.reconcile(sessions, 2), []);
+  allocator.setCats(cats.slice(0, 1));
+  assert.deepEqual(allocator.reconcile(sessions, 3).map(s => s.pack), [cats[0].directory, cats[0].directory]);
+});

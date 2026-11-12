@@ -3,6 +3,8 @@ import SpriteKit
 import PetCore
 
 final class SettingsWindowController: NSWindowController {
+    private var spritesController: SpriteSettingsWindowController?
+    private let packsURL: URL
     private var preferences: PetPreferences
     private let onChange: (PetPreferences) throws -> Void
     private let slider = NSSlider(value: 100, minValue: 50, maxValue: 200, target: nil, action: nil)
@@ -14,7 +16,8 @@ final class SettingsWindowController: NSWindowController {
     private let status = NSTextField(labelWithString: "Changes are saved automatically.")
     private let previewNode = SKSpriteNode()
 
-    init(preferences: PetPreferences, multicats: Bool, textures: [SKTexture], durations: [TimeInterval], onChange: @escaping (PetPreferences) throws -> Void) {
+    init(preferences: PetPreferences, multicats: Bool, packsURL: URL, textures: [SKTexture], durations: [TimeInterval], onChange: @escaping (PetPreferences) throws -> Void) {
+        self.packsURL = packsURL
         self.preferences = preferences; self.onChange = onChange; self.effectiveMulticats = multicats
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 650),
                               styleMask: [.titled, .closable, .miniaturizable], backing: .buffered, defer: false)
@@ -68,6 +71,9 @@ final class SettingsWindowController: NSWindowController {
         multicatsToggle.target = self; multicatsToggle.action = #selector(modeChanged)
         multicatsToggle.toolTip = "Assign a different random cat to each Claude session, choosing unused cats first"
         body.addArrangedSubview(multicatsToggle)
+        let sprites = NSButton(title: "Sprites…", target: self, action: #selector(showSprites))
+        sprites.bezelStyle = .rounded
+        body.addArrangedSubview(sprites)
         wandering.target = self; wandering.action = #selector(behaviorChanged)
         labels.target = self; labels.action = #selector(behaviorChanged)
         body.addArrangedSubview(wandering); body.addArrangedSubview(labels)
@@ -80,6 +86,7 @@ final class SettingsWindowController: NSWindowController {
 
     func refresh(_ value: PetPreferences, multicats: Bool) {
         effectiveMulticats = value.multicats ?? multicats
+        spritesController?.refresh(value)
         preferences = value; slider.doubleValue = value.sizeScale*100
         percentage.stringValue = "\(Int(value.sizeScale*100))%"
         wandering.state = value.allowWandering ? .on : .off
@@ -87,6 +94,18 @@ final class SettingsWindowController: NSWindowController {
         multicatsToggle.state = effectiveMulticats ? .on : .off
         let ratio = previewNode.texture.map { $0.size().width/$0.size().height } ?? 1
         previewNode.size = CGSize(width: 82*value.sizeScale*ratio, height: 82*value.sizeScale)
+    }
+    @objc private func showSprites() {
+        if spritesController == nil {
+            spritesController = SpriteSettingsWindowController(packsURL: packsURL, preferences: preferences) { [weak self] disabled in
+                guard let self else { return }
+                var value = self.preferences; value.disabledSprites = disabled
+                try self.onChange(value)
+                self.refresh(value, multicats: self.effectiveMulticats)
+            }
+        }
+        spritesController?.refresh(preferences)
+        spritesController?.present()
     }
     private func commit(_ value: PetPreferences) {
         do {

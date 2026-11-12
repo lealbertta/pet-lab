@@ -30,3 +30,12 @@ The registry adapter supports Claude Code 2.1.311 and later 2.x releases, includ
 The app uses a user-only Unix socket rather than a TCP listener. `pet-lab status --json` reports mode, preferences, counts, and up to 64 per-pet samples without session IDs or titles. The renderer still creates a cat for every discovered session.
 
 The app bundle is an unsigned local development build. The package is private and cannot be published to npm without changing its metadata and choosing appropriate distribution terms.
+
+### Choose available sprites
+
+Open the paw menu (or right-click a pet), choose **Settings… → Sprites…**.
+Each checkbox enables or disables that cat for Multicats. Use Command-click or
+Shift-click to select rows, then **Enable selected** or **Disable selected**;
+**Select all** selects the whole library. Changes save automatically and apply
+to active sessions. Disabling all sprites hides Multicats pets until a sprite is
+enabled again. The manually selected shared-mode pet is unaffected.

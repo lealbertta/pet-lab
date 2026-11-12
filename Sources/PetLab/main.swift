@@ -427,7 +427,14 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                 guard let image = sheet.cropping(to: CGRect(x: (frame%columns)*size[0], y: (frame/columns)*size[1], width: size[0], height: size[1])) else { return nil }
                 let texture = SKTexture(cgImage: image); texture.filteringMode = .nearest; return texture
             }
-            settingsController = SettingsWindowController(preferences: preferences, multicats: multicats, textures: textures,
+            let libraryCandidates = [packURL.deletingLastPathComponent(), root.appendingPathComponent("packs"),
+                Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("packs")]
+            let spriteLibrary = libraryCandidates.first { directory in
+                (try? FileManager.default.contentsOfDirectory(atPath: directory.path))?.contains {
+                    $0.range(of: "^cat-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil
+                } == true
+            } ?? packURL.deletingLastPathComponent()
+            settingsController = SettingsWindowController(preferences: preferences, multicats: multicats, packsURL: spriteLibrary, textures: textures,
                 durations: definition.frames.indices.map { definition.duration(at: $0) }) { [weak self] value in
                     try value.save(to: preferencesURL)
                     self?.preferences = value
@@ -464,8 +471,12 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
         let active = Set(shown.map(\.key))
         for session in shown {
             retiringUntil.removeValue(forKey: session.key)
-            guard monitorPets[session.key] == nil else { continue }
             let directory = session.pack ?? pack.root.path
+            if let existing = monitorPets[session.key] {
+                if existing.pack.root.path == directory { continue }
+                existing.node.removeAllActions(); existing.activityBar?.panel.close(); existing.panel.close()
+                monitorPets.removeValue(forKey: session.key)
+            }
             let cat: LoadedPack
             if let cached = cachedPacks[directory] { cat = cached }
             else {

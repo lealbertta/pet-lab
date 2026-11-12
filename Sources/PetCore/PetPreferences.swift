@@ -5,21 +5,24 @@ public struct PetPreferences: Codable, Equatable {
     public var allowWandering: Bool
     public var showSessionLabels: Bool
     public var multicats: Bool?
+    public var disabledSprites: [String]
 
-    public init(sizeScale: Double = 1, allowWandering: Bool = true, showSessionLabels: Bool = true, multicats: Bool? = nil) {
+    public init(sizeScale: Double = 1, allowWandering: Bool = true, showSessionLabels: Bool = true, multicats: Bool? = nil, disabledSprites: [String] = []) {
         self.sizeScale = sizeScale.isFinite ? min(max(sizeScale, 0.5), 2) : 1
         self.allowWandering = allowWandering
         self.showSessionLabels = showSessionLabels
         self.multicats = multicats
+        self.disabledSprites = disabledSprites
     }
 
-    enum CodingKeys: String, CodingKey { case sizeScale, allowWandering, showSessionLabels, multicats }
+    enum CodingKeys: String, CodingKey { case sizeScale, allowWandering, showSessionLabels, multicats, disabledSprites }
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         self.init(sizeScale: try values.decodeIfPresent(Double.self, forKey: .sizeScale) ?? 1,
                   allowWandering: try values.decodeIfPresent(Bool.self, forKey: .allowWandering) ?? true,
                   showSessionLabels: try values.decodeIfPresent(Bool.self, forKey: .showSessionLabels) ?? true,
-                  multicats: try values.decodeIfPresent(Bool.self, forKey: .multicats))
+                  multicats: try values.decodeIfPresent(Bool.self, forKey: .multicats),
+                  disabledSprites: try values.decodeIfPresent([String].self, forKey: .disabledSprites) ?? [])
     }
 
     public static func load(from url: URL) -> PetPreferences {
