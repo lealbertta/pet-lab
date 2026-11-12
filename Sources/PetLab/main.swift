@@ -40,8 +40,13 @@ final class PetView: SKView {
     private var mouseDownPoint: NSPoint?
     override var acceptsFirstResponder: Bool { false }
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
-    override func mouseDown(with event: NSEvent) { mouseDownPoint = NSEvent.mouseLocation }
-    override func mouseDragged(with event: NSEvent) {
+    override func mouseDown(with event: NSEvent) { beginDrag() }
+    override func mouseDragged(with event: NSEvent) { continueDrag() }
+    override func mouseUp(with event: NSEvent) { if event.clickCount > 0 { onClick?() }; endDrag() }
+    /// Drag entry points, shared with the session card above the cat so either one moves it.
+    func beginDrag() { mouseDownPoint = NSEvent.mouseLocation }
+    func endDrag() { mouseDownPoint = nil }
+    func continueDrag() {
         guard let window = window, let previous = mouseDownPoint else { return }
         let current = NSEvent.mouseLocation
         let proposed = NSRect(x: window.frame.minX + current.x-previous.x,
@@ -55,7 +60,6 @@ final class PetView: SKView {
         }
         mouseDownPoint = current; onDrag?()
     }
-    override func mouseUp(with event: NSEvent) { if event.clickCount > 0 { onClick?() }; mouseDownPoint = nil }
     override func rightMouseDown(with event: NSEvent) { onMenu?() }
 }
 
@@ -77,6 +81,15 @@ final class PetWindow {
     let index: Int
     var frameTextures: [String: [SKTexture]] = [:]
     var frameAlphaMasks: [String: [[UInt8]]] = [:]
+    /// Share of the frame height that is transparent above the art in every frame of this pack.
+    var clearAboveArt: CGFloat = 0
+    /// How far the session card rises above the cat window: it overlaps the empty space above the art.
+    var cardReserve: CGFloat { max(0, ActivityBar.height + ActivityBar.gap - emptySpaceAboveArt) }
+    /// Transparent space between the top of the window and the highest point the art reaches.
+    var emptySpaceAboveArt: CGFloat {
+        let artTop = node.position.y + node.size.height * (1 - node.anchorPoint.y) - clearAboveArt * node.size.height
+        return max(0, panel.frame.height - artTop)
+    }
     var currentFrameIndex = 0
     var step = 0
     var lastInteraction: TimeInterval = 0
@@ -148,6 +161,13 @@ final class PetWindow {
             }
             frameAlphaMasks[name] = masks
         }
+        // Mask rows run top to bottom; find the highest opaque row any frame uses.
+        let frameWidth = rendering.frameSize[0], frameHeight = rendering.frameSize[1]
+        var topRow = frameHeight
+        for mask in frameAlphaMasks.values.joined() {
+            if let first = mask.firstIndex(where: { $0 > 16 }) { topRow = min(topRow, first / frameWidth) }
+        }
+        clearAboveArt = topRow < frameHeight ? CGFloat(topRow) / CGFloat(frameHeight) : 0
         view.onDrag = { [weak self] in
             self?.roaming = false; self?.roamingMotion = nil; self?.idleRoaming = nil
             self?.lastInteraction = ProcessInfo.processInfo.systemUptime
@@ -184,7 +204,7 @@ final class PetWindow {
     func applyPreferences(_ value: PetPreferences) {
         let needsResize = preferences.sizeScale != value.sizeScale || node.position.y == 12
         preferences = value
-        view.topAccessoryHeight = value.showSessionLabels && activityBar != nil ? ActivityBar.height + ActivityBar.gap : 0
+        view.topAccessoryHeight = value.showSessionLabels && activityBar != nil ? cardReserve : 0
         if !value.showSessionLabels { activityBar?.panel.orderOut(nil) }
         guard needsResize else { return }
         let rendering = pack.manifest.rendering
@@ -197,6 +217,7 @@ final class PetWindow {
         panel.setFrame(NSRect(origin: origin, size: layout.windowSize), display: true)
         view.frame = NSRect(origin: .zero, size: layout.windowSize); scene.size = layout.windowSize
         node.size = layout.spriteSize; node.position = layout.spritePosition
+        if view.topAccessoryHeight > 0 { view.topAccessoryHeight = cardReserve }
         label.position = NSPoint(x: layout.windowSize.width/2, y: layout.spriteSize.height+6)
         if let screen = panel.screen ?? NSScreen.main {
             let bounds = DesktopGeometry.petBounds(on: screen.standingFrame, accessoryHeight: view.topAccessoryHeight, footInset: view.footInset)
@@ -337,7 +358,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                 pets.append(try PetWindow(pack: pack, screen: screen, index: 0, physicalBottom: arguments.contains("--physical-bottom")))
                 pets[0].keepVisibleWhenRetiring = true
                 pets[0].label.isHidden = true
-                pets[0].view.topAccessoryHeight = ActivityBar.height + ActivityBar.gap
+                pets[0].view.topAccessoryHeight = pets[0].cardReserve
                 pets[0].activityBar = ActivityBar(parent: pets[0].panel)
             } else if queue == nil {
                 for i in 0..<count { pets.append(try PetWindow(pack: pack, screen: screen, index: i, physicalBottom: arguments.contains("--physical-bottom"))) }
@@ -457,7 +478,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             let pet = try PetWindow(pack: cat, screen: screen, index: slot, physicalBottom: arguments.contains("--physical-bottom"))
             pet.monitoredSessionKey = session.key
             pet.label.isHidden = true
-            pet.view.topAccessoryHeight = ActivityBar.height + ActivityBar.gap
+            pet.view.topAccessoryHeight = pet.cardReserve
             pet.activityBar = ActivityBar(parent: pet.panel)
             let key = session.key
             let close: () -> Void = { [weak self] in self?.closeCat(for: key) }
@@ -567,7 +588,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             }
             pet.update(activity: activity, title: "\(index+1) \(activity.rawValue)", screen: screen, elapsed: now-lastTick)
             pet.activityBar?.update(snapshot: ownKey.flatMap { monitorSnapshot?.forSession($0) } ?? monitorSnapshot,
-                                    healthy: monitorHealthy, parent: pet.panel)
+                                    healthy: monitorHealthy, parent: pet.panel, emptySpaceAbove: pet.emptySpaceAboveArt)
         }
         if elapsed-lastReport >= 1 {
             let samples: [[String: Any]] = pets.prefix(64).map { pet in
@@ -578,7 +599,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                         "frameChanges": pet.step, "visible": pet.panel.isVisible, "clickThrough": pet.panel.ignoresMouseEvents,
                         "activityBarVisible": pet.activityBar?.panel.isVisible ?? false, "barSessionCount": barCount,
                         "roaming": pet.roaming && preferences.allowWandering, "windowX": pet.panel.frame.minX, "windowY": pet.panel.frame.minY,
-                        "displayHeight": pet.node.size.height,
+                        "displayHeight": pet.node.size.height, "emptyAboveArt": pet.emptySpaceAboveArt,
                         "roamingPhase": pet.idleRoaming?.phase.rawValue ?? "inactive"]
             }
             json(["elapsed": Int(elapsed), "appActive": NSApp.isActive, "events": loadedFiles.count,

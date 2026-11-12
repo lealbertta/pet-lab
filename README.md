@@ -9,6 +9,7 @@ Pixel-art companions for your macOS desktop that follow Claude CLI sessions.
 - Twelve original cat designs, each with nine animations.
 - One shared companion, or a random cat per session with unused designs chosen first.
 - Independent session activity and labels in multicats mode.
+- Session cards above each cat: the chevron switches sessions, the arrow opens the session in the Claude desktop app (or on its own Terminal/iTerm2 tab for CLI sessions), right-click closes the cat, and dragging the card moves the cat.
 - A menu-bar paw that opens Settings.
 - Live pet sizing from 50% to 200%, idle wandering, and session-label controls.
 - A saved multicats toggle; mode changes do not restart the monitor or renderer.

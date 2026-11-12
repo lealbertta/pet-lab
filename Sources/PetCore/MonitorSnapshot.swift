@@ -11,6 +11,16 @@ public struct MonitorSnapshot: Decodable {
         public let activity: Activity
         public let title: String?
         public let pack: String?
+        /// The Claude desktop app's id for this session (`local_…`), when it runs in the app.
+        public let hostSession: String?
+        /// The CLI process, used to bring its terminal forward.
+        public let pid: Int32?
+        /// Deep link that opens this session in the Claude desktop app's Code tab.
+        public var appURL: URL? {
+            guard let id = hostSession, id.hasPrefix("local_"),
+                  id.dropFirst(6).allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-") }), id.count > 6 else { return nil }
+            return URL(string: "claude://code/continue?session=\(id)")
+        }
     }
     public func forSession(_ key: String) -> MonitorSnapshot {
         MonitorSnapshot(schemaVersion: schemaVersion, generation: generation, mode: mode, sharedPack: sharedPack, sessions: sessions.filter { $0.key == key })

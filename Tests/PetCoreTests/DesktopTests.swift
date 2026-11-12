@@ -70,6 +70,13 @@ final class DesktopTests: XCTestCase {
         XCTAssertEqual(own.preferredSession?.pack, "/cats/one")
         XCTAssertTrue(snapshot.forSession("missing").sessions.isEmpty)
     }
+    func testDesktopSessionsGetADeepLinkAndCLISessionsKeepTheirProcess() throws {
+        let snapshot = try JSONDecoder().decode(MonitorSnapshot.self, from: Data(#"{"schemaVersion":1,"generation":"open","sessions":[{"key":"a","activity":"idle","hostSession":"local_9d34-b6"},{"key":"b","activity":"idle","pid":42},{"key":"c","activity":"idle","hostSession":"local_../x"}]}"#.utf8))
+        XCTAssertEqual(snapshot.sessions[0].appURL?.absoluteString, "claude://code/continue?session=local_9d34-b6")
+        XCTAssertNil(snapshot.sessions[1].appURL)
+        XCTAssertEqual(snapshot.sessions[1].pid, 42)
+        XCTAssertNil(snapshot.sessions[2].appURL)
+    }
     func testActivityBarFollowsBusySessionAndAcceptsOlderSnapshots() throws {
         let snapshot = try JSONDecoder().decode(MonitorSnapshot.self, from: Data(#"{"schemaVersion":1,"generation":"a","sessions":[{"key":"a","activity":"idle"},{"key":"b","activity":"working","title":"Fixture task"}]}"#.utf8))
         XCTAssertEqual(snapshot.preferredSession?.key, "b")
