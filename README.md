@@ -2,6 +2,10 @@
 
 Pixel-art companions for your macOS desktop that follow Claude CLI sessions.
 
+![Calico and Black & Tan · 17 side by side, with session cards showing their independent activity](docs/media/pet-lab-demo.gif)
+
+Recorded from the running macOS app with other app windows hidden, cropped to a desktop corner. Calico and Black & Tan · 17 are shown at 75% size, with their session cards cycling through simulated working, needs-input, and ready states.
+
 ![The twelve cats at work](docs/images/cats-working.gif)
 
 ## Meet the Shibas
