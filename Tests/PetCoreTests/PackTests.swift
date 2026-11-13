@@ -56,4 +56,27 @@ final class PackTests: XCTestCase {
         try animation("working") { $0["frames"] = Array(repeating: 0, count: 65) }
         XCTAssertThrowsError(try LoadedPack(directory: root))
     }
+    func testFrameOffsetsTranslateAnchorWithoutChangingTiming() throws {
+        let original = try LoadedPack(directory: root)
+        let rendering = original.manifest.rendering
+        try animation("working") { $0["frameOffsets"] = Array(repeating: [4, 9], count: 8) }
+        let shifted = try LoadedPack(directory: root)
+        let animation = shifted.manifest.animations["working"]!
+        let before = original.manifest.animations["working"]!
+        let anchor = animation.anchor(at: 0, rendering: rendering)
+        XCTAssertEqual(anchor.x, before.anchor(at: 0, rendering: rendering).x - 4 / Double(rendering.frameSize[0]), accuracy: 0.000001)
+        XCTAssertEqual(anchor.y, before.anchor(at: 0, rendering: rendering).y + 9 / Double(rendering.frameSize[1]), accuracy: 0.000001)
+        XCTAssertEqual(animation.frames, before.frames)
+        XCTAssertEqual(animation.duration(at: 0), before.duration(at: 0))
+    }
+
+    func testRejectsMalformedAndOutOfBoundsOffsets() throws {
+        for offsets in [[[0, 0]], Array(repeating: [0], count: 8),
+                        Array(repeating: [Int.max, 0], count: 8),
+                        Array(repeating: [1024, 0], count: 8)] {
+            try animation("working") { $0["frameOffsets"] = offsets }
+            XCTAssertThrowsError(try LoadedPack(directory: root))
+        }
+    }
+
 }

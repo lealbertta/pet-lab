@@ -18,7 +18,16 @@ for name in names {
     let source = CGImageSourceCreateWithURL(root.appendingPathComponent(animation["image"] as! String) as CFURL, nil)!
     let sheet = CGImageSourceCreateImageAtIndex(source, 0, nil)!
     let columns = sheet.width / size[0], indices = animation["frames"] as! [Int]
-    frames[name] = indices.map { sheet.cropping(to: CGRect(x: ($0 % columns)*size[0], y: ($0 / columns)*size[1], width: size[0], height: size[1]))! }
+    let offsets = animation["frameOffsets"] as? [[Int]]
+    frames[name] = indices.enumerated().map { position, index in
+        let frame = sheet.cropping(to: CGRect(x: (index % columns)*size[0], y: (index / columns)*size[1], width: size[0], height: size[1]))!
+        guard let offset = offsets?[position], offset != [0, 0] else { return frame }
+        let context = CGContext(data: nil, width: size[0], height: size[1], bitsPerComponent: 8, bytesPerRow: size[0]*4,
+                                space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.interpolationQuality = .none
+        context.draw(frame, in: CGRect(x: offset[0], y: -offset[1], width: size[0], height: size[1]))
+        return context.makeImage()!
+    }
     durations[name] = animation["frameDurationsMs"] as? [Int] ?? Array(repeating: animation["frameDurationMs"] as! Int, count: indices.count)
 }
 func bitmap(_ width: Int, _ height: Int) -> CGContext {

@@ -24,14 +24,14 @@
         0,
         1,
         2,
-        3
+        1
       ],
       "frameDurationMs": 200,
       "frameDurationsMs": [
-        900,
+        1620,
         180,
         240,
-        900
+        180
       ]
     },
     "walk": {
@@ -58,7 +58,7 @@
         8,
         9,
         10,
-        11
+        9
       ],
       "frameDurationMs": 200,
       "frameDurationsMs": [
@@ -121,8 +121,8 @@
       "frames": [
         24,
         25,
-        26,
-        27
+        24,
+        25
       ],
       "frameDurationMs": 200,
       "frameDurationsMs": [

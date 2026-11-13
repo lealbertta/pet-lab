@@ -17,7 +17,7 @@ The starter manifest provides a complete example. `id` identifies a pack, `artwo
 
 Frames share one size across a pack. A sheet's dimensions must be exact multiples of that size. Frame indices begin at zero, left-to-right then top-to-bottom. Indices may repeat to reuse images, and each referenced frame counts toward the animation and pack budgets. The ground anchor uses top-left pixel coordinates and is shared across frames. Display height uses macOS logical points. `nearest` filtering preserves pixel-art edges; `linear` interpolates.
 
-An animation supplies `image`, `frames`, and a default `frameDurationMs`. Optional `frameDurationsMs` supplies one duration per frame, taking precedence over the default. Optional walk `facing` and `allowMirror` control horizontal mirroring. The app owns playback lifetime; packs do not contain executable code or completion timers.
+An animation supplies `image`, `frames`, and a default `frameDurationMs`. Optional `frameDurationsMs` supplies one duration per frame, taking precedence over the default. Optional `frameOffsets` supplies one `[x, y]` translation per frame reference, in source pixels (right/down positive). The renderer adjusts the anchor without changing the artwork or timing; omitted offsets are zero. Each adjusted anchor must remain inside the frame. This compensates for registration drift while preserving distinct poses. Older readers that reject unknown properties cannot load packs using this extension. Optional walk `facing` and `allowMirror` control horizontal mirroring. The app owns playback lifetime; packs do not contain executable code or completion timers.
 
 | Animation | Requirement | Playback contract |
 | --- | --- | --- |

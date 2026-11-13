@@ -21,8 +21,15 @@ public struct PackManifest: Codable {
         public var frames: [Int]
         public var frameDurationMs: Int
         public var frameDurationsMs: [Int]?
+        /// Per-reference translation in source pixels: positive x right, positive y down.
+        public var frameOffsets: [[Int]]?
         public var facing: String?
         public var allowMirror: Bool?
+        public func anchor(at index: Int, rendering: Rendering) -> CGPoint {
+            let offset = frameOffsets?[index] ?? [0, 0]
+            return CGPoint(x: Double(rendering.anchor[0] - offset[0]) / Double(rendering.frameSize[0]),
+                           y: 1 - Double(rendering.anchor[1] - offset[1]) / Double(rendering.frameSize[1]))
+        }
         public func duration(at index: Int) -> Double {
             Double(frameDurationsMs?[index] ?? frameDurationMs) / 1000
         }
@@ -65,7 +72,7 @@ public struct LoadedPack {
             }
             if let animations = object["animations"] as? [String: [String: Any]] {
                 for animation in animations.values {
-                    try require(Set(animation.keys).isSubset(of: ["image", "frames", "frameDurationMs", "frameDurationsMs", "facing", "allowMirror"]), "Unknown animation property")
+                    try require(Set(animation.keys).isSubset(of: ["image", "frames", "frameDurationMs", "frameDurationsMs", "frameOffsets", "facing", "allowMirror"]), "Unknown animation property")
                 }
             }
         }
@@ -87,6 +94,14 @@ public struct LoadedPack {
             try require((16...2000).contains(animation.frameDurationMs), "\(name): duration must be 16–2000 ms")
             if let durations = animation.frameDurationsMs {
                 try require(durations.count == animation.frames.count && durations.allSatisfy { (16...2000).contains($0) }, "\(name): invalid per-frame durations")
+            }
+            if let offsets = animation.frameOffsets {
+                try require(offsets.count == animation.frames.count, "\(name): offsets must match frame count")
+                for offset in offsets {
+                    try require(offset.count == 2 && offset.allSatisfy { (-1024...1024).contains($0) }, "\(name): invalid frame offset")
+                    try require((0...w).contains(m.rendering.anchor[0] - offset[0]) &&
+                                (0...h).contains(m.rendering.anchor[1] - offset[1]), "\(name): offset moves anchor outside frame")
+                }
             }
             try require(animation.facing == nil || ["left", "right"].contains(animation.facing!), "\(name): invalid facing")
             let parts = animation.image.split(separator: "/", omittingEmptySubsequences: false)

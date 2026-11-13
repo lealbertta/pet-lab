@@ -54,6 +54,7 @@
     },
     "working": {
       "image": "sprites/working-laptop.png",
+      "frameOffsets": [[0, 0], [4, 0], [0, 9], [4, 9]],
       "frames": [
         0,
         1,

@@ -10,9 +10,10 @@ func json(_ object: Any) {
 }
 
 let arguments = Array(CommandLine.arguments.dropFirst())
-/// Pack frames last at least 110 ms (~9 fps) and roaming moves 22 pt/s, so 15 fps keeps timing
-/// and walking smooth while halving the redraw and update work of the old 30 fps loop.
-let petFramesPerSecond = 15
+/// Render sprites at 30 fps; 100 ms typing poses span three display frames.
+/// Session polling and roaming updates retain their separate, lower frequency.
+let petFramesPerSecond = 30
+let petUpdatesPerSecond = 15
 func option(_ name: String, fallback: String) -> String {
     guard let i = arguments.firstIndex(of: name), arguments.indices.contains(i+1) else { return fallback }
     return arguments[i+1]
@@ -233,6 +234,7 @@ final class PetWindow {
         let actions = textures.enumerated().map { i, texture in
             SKAction.sequence([.run { [weak self] in
                 self?.node.texture = texture; self?.currentFrameIndex = i; self?.step += 1
+                if let self { self.node.anchorPoint = definition.anchor(at: i, rendering: self.pack.manifest.rendering) }
             }, .wait(forDuration: definition.duration(at: i))])
         }
         let sequence = SKAction.sequence(actions)
@@ -388,7 +390,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
             quit.target = self; statusMenu = menu
             json(["started": true, "mode": stateFile != nil ? (multicats ? "multicats" : "shared") : queue == nil ? "synthetic-demo" : "event-queue", "displayCount": NSScreen.screens.count,
                   "decodedPixelBytes": pack.decodedBytes, "appActive": NSApp.isActive])
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0/Double(petFramesPerSecond), repeats: true) { [weak self] _ in self?.tick() }
+            timer = Timer.scheduledTimer(withTimeInterval: 1.0/Double(petUpdatesPerSecond), repeats: true) { [weak self] _ in self?.tick() }
         } catch { fputs("Pet Lab: \(error.localizedDescription)\n", stderr); exit(1) }
     }
 
