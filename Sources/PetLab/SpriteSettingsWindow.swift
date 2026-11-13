@@ -1,104 +1,159 @@
 import AppKit
+import SwiftUI
 import PetCore
 
-final class SpriteSettingsWindowController: NSWindowController, NSTableViewDataSource, NSTableViewDelegate {
+private struct SpriteChoice: Identifiable {
+    let id: String
+    let name: String
+    let thumbnail: NSImage?
+}
+
+private final class SpriteChoices: ObservableObject {
+    @Published var sprites: [SpriteChoice] = []
+    @Published var disabled: Set<String> = []
+    @Published var error: String?
+    var change: (Bool, [String]) -> Void = { _, _ in }
+}
+
+private struct SpritePicker: View {
+    @ObservedObject var model: SpriteChoices
+    private var enabledCount: Int { model.sprites.filter { !model.disabled.contains($0.id) }.count }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Choose your sprites").font(.system(size: 23, weight: .bold))
+                Text("Turn on the companions you’d like to see in Multicats.")
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Text("\(enabledCount) of \(model.sprites.count) enabled")
+                    .font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
+                Spacer()
+                Button("Enable all") { model.change(true, model.sprites.map(\.id)) }
+                    .disabled(enabledCount == model.sprites.count)
+                Button("Disable all") { model.change(false, model.sprites.map(\.id)) }
+                    .disabled(enabledCount == 0)
+            }
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
+                    ForEach(model.sprites) { sprite in
+                        card(sprite)
+                    }
+                }
+                .padding(3)
+            }
+            if let error = model.error {
+                Text(error).foregroundStyle(.red).font(.system(size: 12))
+            } else {
+                Text(model.sprites.isEmpty ? "No sprites available." : enabledCount == 0
+                     ? "All sprites are off. Multicats pets are hidden."
+                     : "Changes apply immediately · Saved automatically")
+                    .font(.system(size: 12)).foregroundStyle(.secondary)
+            }
+        }
+        .padding(24)
+        .frame(minWidth: 520, minHeight: 440)
+        .background(Color(nsColor: .windowBackgroundColor))
+    }
+
+    private func card(_ sprite: SpriteChoice) -> some View {
+        let enabled = !model.disabled.contains(sprite.id)
+        return VStack(spacing: 6) {
+            Button { model.change(!enabled, [sprite.id]) } label: {
+                Group {
+                    if let image = sprite.thumbnail {
+                        Image(nsImage: image).resizable().interpolation(.none).scaledToFit()
+                    } else {
+                        Image(systemName: "photo").resizable().scaledToFit().foregroundStyle(.secondary)
+                    }
+                }
+                .frame(width: 40, height: 40)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("\(enabled ? "Disable" : "Enable") \(sprite.name)")
+            Toggle(isOn: Binding(get: { !model.disabled.contains(sprite.id) },
+                                 set: { model.change($0, [sprite.id]) })) {
+                Text(enabled ? "On" : "Off").font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(enabled ? .primary : .secondary)
+            }
+            .toggleStyle(.switch).controlSize(.mini)
+            .accessibilityLabel(sprite.name)
+            .fixedSize()
+        }
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 12).fill(enabled
+            ? Color.accentColor.opacity(0.09) : Color(nsColor: .controlBackgroundColor)))
+        .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(enabled
+            ? Color.accentColor.opacity(0.4) : Color.primary.opacity(0.1), lineWidth: 1))
+        .help(sprite.name)
+    }
+}
+
+final class SpriteSettingsWindowController: NSWindowController {
     private var preferences: PetPreferences
     private let onChange: ([String]) throws -> Void
-    private var sprites: [(id: String, name: String)] = []
+    private let model = SpriteChoices()
     private var loadError: String?
-    private let table = NSTableView()
-    private let status = NSTextField(labelWithString: "")
-    private let enable = NSButton(title: "Enable selected", target: nil, action: nil)
-    private let disable = NSButton(title: "Disable selected", target: nil, action: nil)
 
     init(packsURL: URL, preferences: PetPreferences, onChange: @escaping ([String]) throws -> Void) {
         self.preferences = preferences; self.onChange = onChange
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 560, height: 540),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 600, height: 570),
                               styleMask: [.titled, .closable, .miniaturizable, .resizable], backing: .buffered, defer: false)
         window.title = "Sprites"; window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 500, height: 400)
+        window.minSize = NSSize(width: 520, height: 470)
         super.init(window: window)
         do {
             let urls = try FileManager.default.contentsOfDirectory(at: packsURL, includingPropertiesForKeys: nil)
-            sprites = try urls.filter { $0.lastPathComponent.range(of: "^(cat|shiba|dog)-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil }
-                .sorted { $0.lastPathComponent < $1.lastPathComponent }.map { url in
+            for url in urls.filter({ $0.lastPathComponent.range(of: "^(cat|shiba|dog)-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil })
+                .sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+                do {
                     let manifest = try JSONDecoder().decode(PackManifest.self, from: Data(contentsOf: url.appendingPathComponent("manifest.json")))
-                    return (url.lastPathComponent, manifest.name)
+                    model.sprites.append(SpriteChoice(id: url.lastPathComponent, name: manifest.name,
+                                                      thumbnail: Self.thumbnail(for: manifest, at: url)))
+                } catch {
+                    loadError = "Some sprites couldn’t be loaded. Restart Pet Lab to retry."
                 }
+            }
         } catch {
             loadError = "Couldn’t load the sprite library. Restart Pet Lab to retry."
         }
-        let body = NSStackView(); body.orientation = .vertical; body.alignment = .leading; body.spacing = 14
-        body.translatesAutoresizingMaskIntoConstraints = false
-        window.contentView!.addSubview(body)
-        NSLayoutConstraint.activate([
-            body.leadingAnchor.constraint(equalTo: window.contentView!.leadingAnchor, constant: 24),
-            body.trailingAnchor.constraint(equalTo: window.contentView!.trailingAnchor, constant: -24),
-            body.topAnchor.constraint(equalTo: window.contentView!.topAnchor, constant: 24),
-            body.bottomAnchor.constraint(equalTo: window.contentView!.bottomAnchor, constant: -24)
-        ])
-        let title = NSTextField(labelWithString: "Choose your sprites")
-        title.font = .systemFont(ofSize: 23, weight: .bold); body.addArrangedSubview(title)
-        let detail = NSTextField(wrappingLabelWithString: "Choose which cats Multicats can use. Changes apply to active sessions. Disabling every sprite hides Multicats pets.")
-        detail.textColor = .secondaryLabelColor; body.addArrangedSubview(detail)
-        let hint = NSTextField(labelWithString: "⌘-click or Shift-click to select multiple sprites.")
-        hint.font = .systemFont(ofSize: 12); body.addArrangedSubview(hint)
-        let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier("sprite"))
-        column.title = "Available sprites"; column.width = 480
-        table.addTableColumn(column); table.headerView = nil
-        table.allowsMultipleSelection = true; table.rowHeight = 34
-        table.dataSource = self; table.delegate = self
-        table.setAccessibilityLabel("Sprite availability")
-        let scroll = NSScrollView(); scroll.documentView = table; scroll.hasVerticalScroller = true
-        scroll.borderType = .bezelBorder; body.addArrangedSubview(scroll)
-        scroll.widthAnchor.constraint(equalTo: body.widthAnchor).isActive = true
-        scroll.heightAnchor.constraint(greaterThanOrEqualToConstant: 160).isActive = true
-        let selectAll = NSButton(title: "Select all", target: self, action: #selector(selectAllRows))
-        enable.target = self; enable.action = #selector(enableSelected)
-        disable.target = self; disable.action = #selector(disableSelected)
-        let actions = NSStackView(views: [selectAll, enable, disable]); actions.spacing = 8
-        for button in [selectAll, enable, disable] { button.bezelStyle = .rounded }
-        body.addArrangedSubview(actions)
-        status.font = .systemFont(ofSize: 12); status.textColor = .secondaryLabelColor
-        body.addArrangedSubview(status)
+        model.change = { [weak self] enabled, ids in self?.setEnabled(enabled, ids: ids) }
+        window.contentView = NSHostingView(rootView: SpritePicker(model: model))
         refresh(preferences); window.center()
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    func numberOfRows(in tableView: NSTableView) -> Int { sprites.count }
-    func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
-        let button = NSButton(checkboxWithTitle: sprites[row].name, target: self, action: #selector(toggle(_:)))
-        button.tag = row; button.state = preferences.disabledSprites.contains(sprites[row].id) ? .off : .on
-        button.toolTip = "Allow \(sprites[row].name) in Multicats"
-        return button
-    }
-    func tableViewSelectionDidChange(_ notification: Notification) { updateButtons() }
-    private func updateButtons() {
-        enable.isEnabled = table.numberOfSelectedRows > 0; disable.isEnabled = table.numberOfSelectedRows > 0
+    private static func thumbnail(for manifest: PackManifest, at url: URL) -> NSImage? {
+        let size = manifest.rendering.frameSize
+        guard size.count == 2, size[0] > 0, size[1] > 0,
+              let idle = manifest.animations["idle"], let frame = idle.frames.first, frame >= 0,
+              let image = NSImage(contentsOf: url.appendingPathComponent(idle.image)),
+              let sheet = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let columns = sheet.width / size[0]
+        guard columns > 0, frame / columns < sheet.height / size[1],
+              let crop = sheet.cropping(to: CGRect(x: (frame % columns) * size[0],
+                                                  y: (frame / columns) * size[1],
+                                                  width: size[0], height: size[1])) else { return nil }
+        return NSImage(cgImage: crop, size: NSSize(width: size[0], height: size[1]))
     }
     func refresh(_ value: PetPreferences) {
         preferences = value
-        let selection = table.selectedRowIndexes
-        table.reloadData(); table.selectRowIndexes(selection, byExtendingSelection: false); updateButtons()
-        let count = sprites.filter { !value.disabledSprites.contains($0.id) }.count
-        status.stringValue = loadError ?? (sprites.isEmpty ? "No sprites available." : "\(count) of \(sprites.count) enabled · Saved automatically")
+        model.disabled = Set(value.disabledSprites)
+        model.error = loadError
     }
-    private func setEnabled(_ enabled: Bool, rows: IndexSet) {
+    private func setEnabled(_ enabled: Bool, ids: [String]) {
         var disabled = Set(preferences.disabledSprites)
-        for row in rows {
-            if enabled { disabled.remove(sprites[row].id) } else { disabled.insert(sprites[row].id) }
-        }
+        if enabled { disabled.subtract(ids) } else { disabled.formUnion(ids) }
         do {
             try onChange(disabled.sorted())
             var value = preferences; value.disabledSprites = disabled.sorted(); refresh(value)
-            status.textColor = .secondaryLabelColor
         } catch {
             refresh(preferences)
-            status.stringValue = "Couldn’t save changes. Please try again."; status.textColor = .systemRed
+            model.error = "Couldn’t save changes. Please try again."
         }
     }
-    @objc private func toggle(_ sender: NSButton) { setEnabled(sender.state == .on, rows: IndexSet(integer: sender.tag)) }
-    @objc private func selectAllRows() { table.selectAll(nil) }
-    @objc private func enableSelected() { setEnabled(true, rows: table.selectedRowIndexes) }
-    @objc private func disableSelected() { setEnabled(false, rows: table.selectedRowIndexes) }
     func present() { showWindow(nil); window?.makeKeyAndOrderFront(nil); NSApp.activate(ignoringOtherApps: true) }
 }
