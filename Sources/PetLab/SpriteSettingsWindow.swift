@@ -20,7 +20,7 @@ final class SpriteSettingsWindowController: NSWindowController, NSTableViewDataS
         super.init(window: window)
         do {
             let urls = try FileManager.default.contentsOfDirectory(at: packsURL, includingPropertiesForKeys: nil)
-            sprites = try urls.filter { $0.lastPathComponent.range(of: "^cat-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil }
+            sprites = try urls.filter { $0.lastPathComponent.range(of: "^(cat|shiba|dog)-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil }
                 .sorted { $0.lastPathComponent < $1.lastPathComponent }.map { url in
                     let manifest = try JSONDecoder().decode(PackManifest.self, from: Data(contentsOf: url.appendingPathComponent("manifest.json")))
                     return (url.lastPathComponent, manifest.name)

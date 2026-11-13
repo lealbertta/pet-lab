@@ -20,6 +20,11 @@ test('cat selection is ordered, persistent, and contained in the known library',
     await fs.writeFile(path.join(shiba, 'manifest.json'), JSON.stringify({ name: '16 · Red Shiba' }));
     assert.equal((await findCat(root, '16')).directory, shiba);
     assert.deepEqual((await listCats(root)).map(pet => pet.number), ['03', '12', '16']);
+    const dog = path.join(root, 'packs', 'dog-20-french-bulldog');
+    await fs.mkdir(dog, { recursive: true });
+    await fs.writeFile(path.join(dog, 'manifest.json'), JSON.stringify({ name: '20 · French Bulldog' }));
+    assert.equal((await findCat(root, '20')).directory, dog);
+    assert.deepEqual((await listCats(root)).map(pet => pet.number), ['03', '12', '16', '20']);
     await assert.rejects(findCat(root, '../12'));
     await assert.rejects(findCat(root, '99'));
     assert.equal(await selectedPack(root, root), path.join(root, 'packs/cat-01-calico'));

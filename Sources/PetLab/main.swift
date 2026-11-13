@@ -431,7 +431,7 @@ final class LabDelegate: NSObject, NSApplicationDelegate {
                 Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("packs")]
             let spriteLibrary = libraryCandidates.first { directory in
                 (try? FileManager.default.contentsOfDirectory(atPath: directory.path))?.contains {
-                    $0.range(of: "^cat-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil
+                    $0.range(of: "^(cat|shiba|dog)-[0-9]{2}-[a-z-]+$", options: .regularExpression) != nil
                 } == true
             } ?? packURL.deletingLastPathComponent()
             settingsController = SettingsWindowController(preferences: preferences, multicats: multicats, packsURL: spriteLibrary, textures: textures,

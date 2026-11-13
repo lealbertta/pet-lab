@@ -1,0 +1,240 @@
+{
+  "animations" : {
+    "attention" : {
+      "frameDurationMs" : 150,
+      "frameDurationsMs" : [
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150,
+        150
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/attention.png"
+    },
+    "error" : {
+      "frameDurationMs" : 130,
+      "frameDurationsMs" : [
+        130,
+        130,
+        130,
+        130,
+        130,
+        130,
+        130,
+        130
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/error.png"
+    },
+    "idle" : {
+      "frameDurationMs" : 260,
+      "frameDurationsMs" : [
+        260,
+        260,
+        260,
+        260,
+        260,
+        260,
+        260,
+        260
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/idle.png"
+    },
+    "retire" : {
+      "frameDurationMs" : 120,
+      "frameDurationsMs" : [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/retire.png"
+    },
+    "sleep" : {
+      "frameDurationMs" : 425,
+      "frameDurationsMs" : [
+        425,
+        425,
+        425,
+        425,
+        425,
+        425,
+        425,
+        425
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/sleep.png"
+    },
+    "spawn" : {
+      "frameDurationMs" : 120,
+      "frameDurationsMs" : [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/spawn.png"
+    },
+    "success" : {
+      "frameDurationMs" : 95,
+      "frameDurationsMs" : [
+        95,
+        95,
+        95,
+        95,
+        95,
+        95,
+        95,
+        95
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/success.png"
+    },
+    "walk" : {
+      "allowMirror" : true,
+      "facing" : "right",
+      "frameDurationMs" : 95,
+      "frameDurationsMs" : [
+        95,
+        95,
+        95,
+        95,
+        95,
+        95,
+        95,
+        95
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/walk.png"
+    },
+    "working" : {
+      "frameDurationMs" : 120,
+      "frameDurationsMs" : [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120
+      ],
+      "frames" : [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "image" : "sprites\/working.png"
+    }
+  },
+  "artworkVersion" : "1.1.0",
+  "author" : "Albert Le · artwork generated with OpenAI ImageGen",
+  "formatVersion" : 1,
+  "id" : "local.petlab.dog20.french-bulldog",
+  "license" : "AI-generated original artwork for this personal Pet Lab project.",
+  "name" : "20 · French Bulldog",
+  "rendering" : {
+    "anchor" : [
+      160,
+      254
+    ],
+    "displayHeight" : 235,
+    "filtering" : "linear",
+    "frameSize" : [
+      320,
+      320
+    ]
+  }
+}
